@@ -1,6 +1,6 @@
 ---
 title: React Server Side Rendering with Hypernova
-date: '2015-05-01T22:12:03.284Z'
+date: '2017-04-10T12:00:00.284Z'
 description: 'React Server Side Rendering with Hypernova'
 ---
 
@@ -9,9 +9,8 @@ _In this tutorial, we'll learn how to set up Server Side Rendering of React Comp
 **Situation:** You've written a React app, and your website works great. Of course it does! But you begin to wonder, how can I improve performance on the client? The answer, of course, is [Server Side Rendering](https://facebook.github.io/react/docs/react-dom-server.html)!
 
 ![Actual footage of a user loading an SSR-enabled website for the first time.](https://media.tenor.co/images/8e9b53a9854d5333a923fca831064508/tenor.gif)
-_Actual footage of a user loading an SSR-enabled website for the first time._
 
-<span style="color: #999; font-size: 15px; text-align: center">Actual footage of a user loading an SSR-enabled website for the first time.</span>
+<small>_Actual footage of a user loading an SSR-enabled website for the first time._</small>
 
 Here are some great benefits to Server Side Rendering (SSR) your React components:
 
@@ -60,16 +59,48 @@ $ tree
 
 Where `index.jsx` and `sheep.jsx` look like the following:
 
-<script src="https://gist.github.com/magicmark/55599b44c94b7ad31b447a25afce1fea.js"></script>
+```jsx
+// index.jsx
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Sheep from './sheep';
+
+ReactDOM.render(<Sheep />, document.getElementById('root'));
+```
+
+```jsx
+// sheep.jsx
+
+import React from 'react';
+
+export default () => (
+    <div>
+        <p>beep beep I'm a sheep</p>
+    </div>
+)
+```
 
 `Sheep` is a "top-level" component, a component that gets loaded into the page with `ReactDOM.render`. Any components that are nested within `Sheep`, we don't care about - it's only these top level components that we'll be passing to the SSR server.
 
 ![](https://i.imgur.com/g2cTcza.jpg)
-<span style="color: #999; font-size: 15px; text-align: center">(Sheep way prefer baaaackbone over React.)</span>
 
-To complete the picture, we transpile with babel and use webpack to create a bundle that gets loaded into a template `index.html`.
+<small>(Sheep way prefer baaaackbone over React.)</small>
 
-<script src="https://gist.github.com/magicmark/f96f5d22f7ceb78c66d811c5da05aeed.js"></script>
+To complete the picture, we transpile with babel and use webpack to create a bundle that gets loaded into a template `index.html`:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Example App</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>
+```
 
 Running `yarn start` runs webpack, spits out a build folder, launches a webserver and everything works as expected.
 
