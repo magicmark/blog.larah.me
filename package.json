@@ -25,6 +25,7 @@
     "gatsby-source-filesystem": "^2.1.22",
     "gatsby-transformer-remark": "^2.6.22",
     "gatsby-transformer-sharp": "^2.2.14",
+    "prism-themes": "^1.1.0",
     "prismjs": "^1.17.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
@@ -36,6 +37,8 @@
     "typography-theme-wordpress-2016": "^0.16.19"
   },
   "devDependencies": {
+    "@sharkcore/eslint-config": "^1.1.0-alpha.3",
+    "eslint": "^6.4.0",
     "prettier": "^1.18.2"
   },
   "homepage": "https://github.com/gatsbyjs/gatsby-starter-blog#readme",
@@ -52,7 +55,7 @@
     "build": "gatsby build",
     "develop": "gatsby develop",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
-    "start": "npm run develop",
+    "start": "yarn run develop",
     "serve": "gatsby serve",
     "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing \""
   }
