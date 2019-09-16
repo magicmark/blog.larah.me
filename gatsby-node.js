@@ -2,7 +2,14 @@ const path = require(`path`);
 const { createFilePath } = require(`gatsby-source-filesystem`);
 
 exports.createPages = async ({ graphql, actions }) => {
-  const { createPage } = actions;
+  const { createPage, createRedirect } = actions;
+
+  // Old blog site url redirects
+  createRedirect({
+    fromPath: '/2017/04/10/react-server-side-rendering',
+    toPath: '/react-server-side-rendering',
+    isPermanent: true,
+  });
 
   const blogPost = path.resolve(`./src/templates/blog-post.js`);
   const result = await graphql(
@@ -24,7 +31,7 @@ exports.createPages = async ({ graphql, actions }) => {
           }
         }
       }
-    `
+    `,
   );
 
   if (result.errors) {
@@ -44,8 +51,8 @@ exports.createPages = async ({ graphql, actions }) => {
       context: {
         slug: post.node.fields.slug,
         previous,
-        next
-      }
+        next,
+      },
     });
   });
 };
@@ -58,7 +65,7 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
     createNodeField({
       name: `slug`,
       node,
-      value
+      value,
     });
   }
 };

@@ -75,10 +75,10 @@ ReactDOM.render(<Sheep />, document.getElementById('root'));
 import React from 'react';
 
 export default () => (
-    <div>
-        <p>beep beep I'm a sheep</p>
-    </div>
-)
+  <div>
+    <p>beep beep I'm a sheep</p>
+  </div>
+);
 ```
 
 `Sheep` is a "top-level" component, a component that gets loaded into the page with `ReactDOM.render`. Any components that are nested within `Sheep`, we don't care about - it's only these top level components that we'll be passing to the SSR server.
@@ -92,13 +92,13 @@ To complete the picture, we transpile with babel and use webpack to create a bun
 ```html
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>My Example App</title>
-    <meta charset="utf-8">
-</head>
-<body>
+    <meta charset="utf-8" />
+  </head>
+  <body>
     <div id="root"></div>
-</body>
+  </body>
 </html>
 ```
 
@@ -135,7 +135,13 @@ We will define a file, `components-entrypoint.jsx`, to import all the top-level 
 
 Here's what our `components-entrypoint.jsx` file looks like:
 
-<script src="https://gist.github.com/magicmark/c62b4ae00e9f0bcfb99462feb8d48893.js"></script>
+```js
+import Cow from './jsx/cow';
+import Pig from './jsx/pig';
+import Sheep from './jsx/sheep';
+
+export { Cow, Pig, Sheep };
+```
 
 We now need to modify our webpack setup to generate an additional bundle for SSR, using our `components-entrypoint.jsx` file.
 
@@ -143,7 +149,32 @@ We now need to modify our webpack setup to generate an additional bundle for SSR
 
 Here is `webpack.ssr.config.js`:
 
-<script src="https://gist.github.com/magicmark/6a2cff6c2fd11b4c424e2557df118d02.js"></script>
+```jsx
+const path = require('path');
+const nodeExternals = require('webpack-node-externals');
+
+module.exports = {
+  entry: './assets/components-entrypoint.jsx',
+  target: 'node',
+  externals: [nodeExternals()],
+  output: {
+    libraryTarget: 'commonjs',
+    path: path.join(__dirname, 'ssr'),
+    filename: 'ssr-bundle.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.jsx?$/,
+        use: 'babel-loader',
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.js', '.jsx'],
+  },
+};
+```
 
 Running `yarn run build-ssr` spits out the compiled bundle.
 
@@ -159,7 +190,25 @@ This is especially useful advice when deploying as part of a microservice archit
 
 In the directory `ssr`, let's create the following Hypernova server:
 
-<script src="https://gist.github.com/magicmark/46d4cf41d8dc6f338428890801a309e3.js"></script>
+```js
+//  hypernova-server.js
+
+const bundle = require('./ssr-bundle');
+const hypernova = require('hypernova/server');
+const renderReact = require('hypernova-react').renderReact;
+
+hypernova({
+  getComponent(name) {
+    for (let componentName in bundle) {
+      if (name === componentName) {
+        return renderReact(componentName, bundle[componentName]);
+      }
+    }
+
+    return null;
+  },
+});
+```
 
 We can verify the server works by running the server with `yarn run start-ssr` and querying the API for our `Sheep` component:
 
@@ -190,7 +239,23 @@ _Checkout the branch `stage-3` in the [example repo](https://github.com/magicmar
 
 Let's turn `index.html` into a function that accepts some markup:
 
-<script src="https://gist.github.com/magicmark/75177ecdf89eec6e4cc1709a11c6ebd8.js"></script>
+```js
+// index.template.js
+
+module.exports = sheepMarkup => `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>My Example App</title>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        ${sheepMarkup}
+        <script type="text/javascript" src="bundle.js"></script>
+    </body>
+    </html>
+`;
+```
 
 This enables us to get the markup from Hypernova and pass it down as an argument. (In the real world where markup probably already lives in templates, this may not be easily doable. This will be discussed further in a future blog post, but the answer for now is [string substitution](https://github.com/airbnb/hypernova-ruby/blob/04d7260/lib/hypernova.rb#L38).)
 
@@ -200,11 +265,52 @@ _Checkout the branch `stage-4` in the [example repo](https://github.com/magicmar
 
 Finally! Now we can call Hypernova from our webserver and plug the rendered React markup into our template.
 
-<script src="https://gist.github.com/magicmark/b0129e5dd3e0327ffafafc2dc88ba315.js"></script>
+```js
+// webserver.js
+
+const path = require('path');
+const axios = require('axios');
+const express = require('express');
+const template = require('./assets/index.template');
+
+const app = express();
+
+app.use(
+  '/bundle.js',
+  express.static(path.join(__dirname, 'build', 'bundle.js')),
+);
+
+app.get('/', function(req, res) {
+  axios
+    .post('http://localhost:8080/batch', {
+      mysheep: {
+        name: 'Sheep',
+        data: {},
+      },
+    })
+    .then(response => {
+      const mysheep = response.data.results.mysheep.html;
+      const renderedMarkup = template(mysheep);
+      res.send(renderedMarkup);
+    });
+});
+
+app.listen(22222, () => {
+  console.log('Server listening on port 22222!');
+});
+```
 
 We also need to update `index.jsx` to let Hypernova hook into the rendered components instead of using `ReactDOM.render`
 
-<script src="https://gist.github.com/magicmark/4db35f601ce630b06f7d4bbbc62bec74.js"></script>
+```jsx
+// index.jsx
+
+import { renderReact } from 'hypernova-react';
+import Sheep from './sheep';
+
+// All instances of 'Sheep' on the page will be hydrated by Hypernova with this
+renderReact('Sheep', Sheep);
+```
 
 Fingers crossed - let's run `yarn start` to compile webpack, launch Hypernova and start the webserver and hopefully...
 
