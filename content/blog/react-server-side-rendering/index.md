@@ -14,16 +14,16 @@ _In this tutorial, we'll learn how to set up Server Side Rendering of React Comp
 
 Here are some great benefits to Server Side Rendering (SSR) your React components:
 
-- Improved SEO Results [^1]
-- No waiting for JavaScript to load on the client
-- Works (sorta) for users with JavaScript disabled
+-   Improved SEO Results [^1]
+-   No waiting for JavaScript to load on the client
+-   Works (sorta) for users with JavaScript disabled
 
 There are a few projects that we could use to do SSR:
 
-- https://github.com/redfin/react-server
-- https://formidable.com/blog/2017/introducing-rapscallion/
-- http://www.electrode.io/
-- https://github.com/airbnb/hypernova
+-   https://github.com/redfin/react-server
+-   https://formidable.com/blog/2017/introducing-rapscallion/
+-   http://www.electrode.io/
+-   https://github.com/airbnb/hypernova
 
 ### Why?
 
@@ -75,9 +75,9 @@ ReactDOM.render(<Sheep />, document.getElementById('root'));
 import React from 'react';
 
 export default () => (
-  <div>
-    <p>beep beep I'm a sheep</p>
-  </div>
+    <div>
+        <p>beep beep I'm a sheep</p>
+    </div>
 );
 ```
 
@@ -92,13 +92,13 @@ To complete the picture, we transpile with babel and use webpack to create a bun
 ```html
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>My Example App</title>
-    <meta charset="utf-8" />
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+    <head>
+        <title>My Example App</title>
+        <meta charset="utf-8" />
+    </head>
+    <body>
+        <div id="root"></div>
+    </body>
 </html>
 ```
 
@@ -118,10 +118,10 @@ Instead of sending over a static compiled template that contains everything, we'
 
 We'll do this in a few stages:
 
-- Building a bundle for all our entrypoints
-- Building a server to consume the bundle and serve the components
-- Splitting up the `index.html` template to take in SSR components
-- Refactoring our web server to serve the combined template + components
+-   Building a bundle for all our entrypoints
+-   Building a server to consume the bundle and serve the components
+-   Splitting up the `index.html` template to take in SSR components
+-   Refactoring our web server to serve the combined template + components
 
 Eventually, our stack will look like this:
 ![](https://i.imgur.com/lP3aXs2.png)
@@ -154,25 +154,25 @@ const path = require('path');
 const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
-  entry: './assets/components-entrypoint.jsx',
-  target: 'node',
-  externals: [nodeExternals()],
-  output: {
-    libraryTarget: 'commonjs',
-    path: path.join(__dirname, 'ssr'),
-    filename: 'ssr-bundle.js',
-  },
-  module: {
-    rules: [
-      {
-        test: /\.jsx?$/,
-        use: 'babel-loader',
-      },
-    ],
-  },
-  resolve: {
-    extensions: ['.js', '.jsx'],
-  },
+    entry: './assets/components-entrypoint.jsx',
+    target: 'node',
+    externals: [nodeExternals()],
+    output: {
+        libraryTarget: 'commonjs',
+        path: path.join(__dirname, 'ssr'),
+        filename: 'ssr-bundle.js',
+    },
+    module: {
+        rules: [
+            {
+                test: /\.jsx?$/,
+                use: 'babel-loader',
+            },
+        ],
+    },
+    resolve: {
+        extensions: ['.js', '.jsx'],
+    },
 };
 ```
 
@@ -198,15 +198,15 @@ const hypernova = require('hypernova/server');
 const renderReact = require('hypernova-react').renderReact;
 
 hypernova({
-  getComponent(name) {
-    for (let componentName in bundle) {
-      if (name === componentName) {
-        return renderReact(componentName, bundle[componentName]);
-      }
-    }
+    getComponent(name) {
+        for (let componentName in bundle) {
+            if (name === componentName) {
+                return renderReact(componentName, bundle[componentName]);
+            }
+        }
 
-    return null;
-  },
+        return null;
+    },
 });
 ```
 
@@ -276,27 +276,27 @@ const template = require('./assets/index.template');
 const app = express();
 
 app.use(
-  '/bundle.js',
-  express.static(path.join(__dirname, 'build', 'bundle.js')),
+    '/bundle.js',
+    express.static(path.join(__dirname, 'build', 'bundle.js')),
 );
 
 app.get('/', function(req, res) {
-  axios
-    .post('http://localhost:8080/batch', {
-      mysheep: {
-        name: 'Sheep',
-        data: {},
-      },
-    })
-    .then(response => {
-      const mysheep = response.data.results.mysheep.html;
-      const renderedMarkup = template(mysheep);
-      res.send(renderedMarkup);
-    });
+    axios
+        .post('http://localhost:8080/batch', {
+            mysheep: {
+                name: 'Sheep',
+                data: {},
+            },
+        })
+        .then(response => {
+            const mysheep = response.data.results.mysheep.html;
+            const renderedMarkup = template(mysheep);
+            res.send(renderedMarkup);
+        });
 });
 
 app.listen(22222, () => {
-  console.log('Server listening on port 22222!');
+    console.log('Server listening on port 22222!');
 });
 ```
 

@@ -1,12 +1,8 @@
 {
-  "name": "gatsby-starter-blog",
+  "name": "blog-larah-me",
   "private": true,
-  "description": "A starter for a blog powered by Gatsby and Markdown",
-  "version": "0.1.0",
-  "author": "Kyle Mathews <mathews.kyle@gmail.com>",
-  "bugs": {
-    "url": "https://github.com/gatsbyjs/gatsby/issues"
-  },
+  "description": "Blog for mark.larah.me",
+  "author": "Mark Larah <mark@larah.me>",
   "dependencies": {
     "gatsby": "^2.15.15",
     "gatsby-image": "^2.2.19",
@@ -35,23 +31,14 @@
     "typeface-merriweather": "0.0.72",
     "typeface-montserrat": "0.0.75",
     "typography": "^0.16.19",
-    "typography-theme-wordpress-2016": "^0.16.19"
+    "typography-theme-github": "^0.16.19"
   },
   "devDependencies": {
     "@sharkcore/eslint-config": "^1.1.0-alpha.3",
-    "eslint": "^6.4.0",
+    "eslint": "4.x",
     "prettier": "^1.18.2"
   },
-  "homepage": "https://github.com/gatsbyjs/gatsby-starter-blog#readme",
-  "keywords": [
-    "gatsby"
-  ],
   "license": "MIT",
-  "main": "n/a",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/gatsbyjs/gatsby-starter-blog.git"
-  },
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop",
