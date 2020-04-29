@@ -1,5 +1,5 @@
 ---
-title: Stop throwing `new Error(error)`!
+title: Don't rethrow `new Error(error)`!
 date: 2020-04-29T12:00:00.284Z
 description: How to safely capture and rethrow errors without losing information
 ---
