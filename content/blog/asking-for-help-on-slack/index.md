@@ -1,7 +1,7 @@
 ---
-title: Asking for Help in Slack/IRC
+title: Asking for help in Slack/IRC
 date: '2019-05-29T21:21:00.284Z'
-description: How to Ask Great Questions for Technical Help in Slack / IRC
+description: How to ask great questions for technical help in Slack / IRC
 ---
 
 > **tl;dr - please include the following with your slack message!**
