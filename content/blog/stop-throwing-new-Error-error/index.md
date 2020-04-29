@@ -6,7 +6,7 @@ description: How to safely capture and rethrow errors without losing information
 
 You may be tempted to rethrow an error object passed to you by a library or function call.
 
-Here’s an example using Apollo’s `userQuery` hook:
+Here’s an example using Apollo’s `useQuery` hook:
 
 ```js
 function Pets() {
