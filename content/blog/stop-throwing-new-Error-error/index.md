@@ -55,7 +55,7 @@ throw new Error(error);
 
 This is a problem because **valuable stack trace information (and any custom error object attributes) will be thrown away and lost** when we create a brand new error object.
 
-Specifically, it will hide where the error was originally thrown from in the stack trace. When you go to look at the stack traces you've collected, you'll see that they start from where you re-threw the error - not where the underlying error occured.
+Specifically, it will hide where the error was originally thrown from in the stack trace. When you go to look at the stack traces you've collected, you'll see that they start from where you re-threw the error - not where the underlying error occurred.
 
 ## What should I do instead?
 
