@@ -93,6 +93,8 @@ Here's a runnable example so you can see the difference between these two approa
 
 This is a totally legitimate thing to want to do! Maybe you have a custom error class that you want to throw instead, so you can provide better error messages.
 
+(This is a good way to include the extra context of where the error is being _rethrown_ from.)
+
 It's still recommended to include the original error, so you get the best of both worlds. The following libraries help you to do that:
 
 - https://github.com/joyent/node-verror
