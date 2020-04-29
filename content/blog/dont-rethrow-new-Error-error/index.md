@@ -59,7 +59,7 @@ Specifically, it will hide where the error was originally thrown from in the sta
 
 ## What should I do instead?
 
-If you know that error is already an error object, you can simply rethrow it:
+If you know that `error` is already an error object, you can simply rethrow it:
 
 ```diff
  foo((err, data) => {
