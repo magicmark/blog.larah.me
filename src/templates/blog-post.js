@@ -10,7 +10,16 @@ class BlogPostTemplate extends React.Component {
     render() {
         const post = this.props.data.markdownRemark;
         const siteTitle = this.props.data.site.siteMetadata.title;
-        const { previous, next } = this.props.pageContext;
+        const { previous, next, slug } = this.props.pageContext;
+
+        const discussUrl = `https://mobile.twitter.com/search?q=${encodeURIComponent(
+            `https://blog.larah.me${slug}`,
+        )}`;
+
+        const editUrl = `https://github.com/magicmark/blog.larah.me/edit/master/content/blog/${slug.slice(
+            1,
+            slug.length - 1,
+        )}/index.md`;
 
         return (
             <Layout location={this.props.location} title={siteTitle}>
@@ -39,6 +48,23 @@ class BlogPostTemplate extends React.Component {
                         </p>
                     </header>
                     <section dangerouslySetInnerHTML={{ __html: post.html }} />
+                    <p>
+                        <a
+                            href={discussUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Discuss on Twitter
+                        </a>
+                        {` • `}
+                        <a
+                            href={editUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Edit on GitHub
+                        </a>
+                    </p>
                     <hr
                         style={{
                             marginBottom: rhythm(1),
@@ -98,6 +124,9 @@ export const pageQuery = graphql`
                 title
                 date(formatString: "MMMM DD, YYYY")
                 description
+            }
+            fields {
+                slug
             }
         }
     }
