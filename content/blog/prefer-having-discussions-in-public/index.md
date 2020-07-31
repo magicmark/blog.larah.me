@@ -30,7 +30,7 @@ or Pull Request).
 
 - **Private channels are private.**
 
-  - There's no searchable paper trail to for future teammates to refer back to
+  - There's no searchable paper trail for future teammates to refer back to
     later about the surrounding context in which a decision was made.
   - (Yes this is also true of equivalent in-person meetings, but that's a
     seperate blog post for another day)
