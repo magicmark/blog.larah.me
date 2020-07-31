@@ -43,6 +43,6 @@ or Pull Request).
 
 ## What should I do if someone DMs me a technical question anyway?
 
-Don't be afraid to gently respond something like "hey, let's take this back to #<team channel> so others can weigh in!" and move the conversation over.
+Don't be afraid to gently respond something like "hey, let's take this back to #\<team channel> so others can weigh in!" and move the conversation over.
 
 (Or feel free to link to this post for the motivation and let me be the bad guy :P)
