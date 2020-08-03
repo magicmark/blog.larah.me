@@ -63,3 +63,4 @@ Questions with MREs are the _very best_ kind of questions one could hope to rece
 -   http://rurounijones.github.io/blog/2009/03/17/how-to-ask-for-help-on-irc/
 -   https://stackoverflow.com/help/mcve
 -   https://meta.stackexchange.com/questions/66377/what-is-the-xy-problem
+-   https://jvns.ca/blog/good-questions/
