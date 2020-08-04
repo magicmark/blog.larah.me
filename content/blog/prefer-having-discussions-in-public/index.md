@@ -46,5 +46,4 @@ or Pull Request).
 Don't be afraid to gently respond something like "hey, let's take this back to
 \<team channel> so others can weigh in!" and move the conversation over.
 
-(Or feel free to link to this post for the motivation and let me be the killjoy
-:P)
+(Or feel free to link to this post and let me be the killjoy :P)
