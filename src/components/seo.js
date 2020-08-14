@@ -68,7 +68,9 @@ function SEO({ description, lang, meta, title }) {
                     content: metaDescription,
                 },
             ].concat(meta)}
-        />
+        >
+            <script data-goatcounter="https://mark-blog.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+        </Helmet>
     );
 }
 
