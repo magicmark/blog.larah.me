@@ -1,7 +1,7 @@
 ---
-title: React Server Side Rendering with Hypernova
+title: Writing explicit type guards in JavaScript
 date: '2020-08-25T12:00:00.284Z'
-description: 'React Server Side Rendering with Hypernova'
+description: 'Writing explicit type guards in JavaScript'
 ---
 
 Inside a function with arguments, you may want to write a guard to check that a parameter has been set before using it.
