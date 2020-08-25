@@ -1,7 +1,7 @@
 ---
-title: Write explicit type guards in JavaScript
+title: Write explicit type guards
 date: '2020-08-25T12:00:00.284Z'
-description: 'Write explicit type guards in JavaScript'
+description: How and why you should write explicit type guards, using JavaScript as an example.
 ---
 
 Inside a function with arguments, you may want to write a guard to check that a parameter has been set before using it.
