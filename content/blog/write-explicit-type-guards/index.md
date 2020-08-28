@@ -76,9 +76,12 @@ function myMethod(foo: ?string) {
 
 This avoids any type coercion issues, and provides an extra runtime check that your inputs are the type you expect.
 
+There’s not a huge amount of downside here, and explicitness is never usually a bad thing... If in doubt, go for this option.
+
 ### Takeaway
 
-My suggestion is: remember that `undefined !== null`, and even better is to explicitly check for the type you want, vs checking for types you _don't_ want!
+- remember that `undefined !== null`.  90% of the time you’ll want to guard against both values.
+- even better is to explicitly check for the type you want, vs checking for types you _don't_ want!
 
 ### Reference
 
