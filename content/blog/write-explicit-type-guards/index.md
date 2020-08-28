@@ -30,7 +30,7 @@ This approach of `if (foo)` above relies on [type coercion](https://developer.mo
 
 But what if our input is the empty string? Empty strings are falsey, so our function wouldn't print anything - maybe not what we wanted! This problem also affects numbers, boolean arguments, or anything else that could coerce to falsey.
 
-So let's we want to allow for empty strings - we'll need to try something else. Maybe we could use [`===`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators#Identity) and check explicitly for `null`?
+Let's say we _do_ want to allow for empty strings - we'll need to try something else. Maybe we could use [`===`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators#Identity) and check explicitly for `null`?
 
 ```js
 function myMethod(foo: ?string) {
