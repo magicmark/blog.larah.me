@@ -81,7 +81,7 @@ There’s not a huge amount of downside here, and explicitness is never usually 
 ### Takeaway
 
 - remember that `undefined !== null`.  90% of the time you’ll want to guard against both values.
-- even better is to explicitly check for the type you want, vs checking for types you _don't_ want!
+- even better is to explicitly check for the type you _do_ want, vs checking for types you _don't_ want.
 
 ### Reference
 
