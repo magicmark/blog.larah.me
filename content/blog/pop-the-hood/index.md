@@ -39,7 +39,7 @@ persists, we now have two options:
 2. Pop the hood open and take a look. Read the source code and understand the
    relevant bits of the code that’s failing.
 
-![](./man-open-hood.jpeg '#margin=20px 0')
+![](./hood.gif '#margin=10px 0')
 
 It's always worth trying option 2 first. If there’s an oil leak, don’t drive the
 car straight to the garage - pop the hood open and see how the oil flows through
