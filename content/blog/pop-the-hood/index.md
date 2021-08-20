@@ -1,6 +1,6 @@
 ---
 title: To understand anything, keep popping the hood.
-date: 2021-08-19T12:00:00.284Z
+date: 2021-08-20T12:00:00.284Z
 description: You have the ability to understand anything. High five!
 ---
 
