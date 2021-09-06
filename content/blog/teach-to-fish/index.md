@@ -1,7 +1,7 @@
 ---
 title: Teaching people to fish
 date: 2021-09-06T12:00:00.284Z
-description: When and how to not directly give answers as a mentor
+description: When and how to not directly give answers as a mentor.
 ---
 
 Remember this classic quote:
