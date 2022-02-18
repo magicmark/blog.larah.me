@@ -20,10 +20,9 @@ Y for themselves.
 - You _could_ just link them to the wiki page that documents Y. Better to provide
   the search term you used to get there, and share how stuff is commonly
   documented in the wiki in general.
-- You _could_ just link them the line of code in GitHub/SourceGraph that defines
-  the behavior of Y. Better to show them how to use git grep and figure out which
-  repo Y lives in, and share the knowledge of how to use SourceGraph to find code
-  in general.
+- You _could_ just link them the line of code in GitHub that defines the behavior
+  of Y. Better to show them how to use git grep and figure out which repo Y lives
+  in, and share the knowledge of how to use SourceGraph to find code in general.
 
 Teach them to fish.
 
