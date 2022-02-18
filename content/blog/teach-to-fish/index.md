@@ -17,10 +17,10 @@ We want to train folks to find those answers for themselves. Instead of saying
 “oh yeah X isn’t working because of Y”, walk them through how they could discover
 Y for themselves.
 
-- You could just link them to the wiki page that documents Y. Better to provide
+- You _could_ just link them to the wiki page that documents Y. Better to provide
   the search term you used to get there, and share how stuff is commonly
   documented in the wiki in general.
-- You could just link them the line of code in GitHub/SourceGraph that defines
+- You _could_ just link them the line of code in GitHub/SourceGraph that defines
   the behavior of Y. Better to show them how to use git grep and figure out which
   repo Y lives in, and share the knowledge of how to use SourceGraph to find code
   in general.
