@@ -22,7 +22,8 @@ Y for themselves.
   documented in the wiki in general.
 - You _could_ just link them to the line of code in GitHub that defines the behavior
   of Y. Better to show them how to use git grep and figure out which repo Y lives
-  in, and share the knowledge of how to use SourceGraph to find code in general.
+  in, and share the knowledge of how to use your orginzation's tools to find code in
+  general.
 
 Teach them to fish.
 
