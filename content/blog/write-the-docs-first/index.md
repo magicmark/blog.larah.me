@@ -1,10 +1,8 @@
 ---
-title: Documentation Driven Design
+title: Write the docs first!
 date: '2023-02-15T09:45:00.284Z'
-description: Write the API documentation first!
+description: Working a new thing for other developers to use? Write the docs first!
 ---
-
-No but it’s actually cool - hear me out!
 
 If you’re working on a new infrastructure project (i.e. your customers are other developers), then my strong recommendation is **write the API documentation for it first**.
 
