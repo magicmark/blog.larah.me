@@ -1,6 +1,6 @@
 ---
 title: Documentation Driven Design
-date: '2023-02-15T09:45.00.284Z'
+date: '2023-02-15T09:45:00.284Z'
 description: Write the API documentation first!
 ---
 
