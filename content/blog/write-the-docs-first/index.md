@@ -4,7 +4,7 @@ date: '2023-02-15T09:45:00.284Z'
 description: Working a new thing for other developers to use? Write the docs first!
 ---
 
-If you’re working on a new infrastructure project (i.e. your customers are other developers), then my strong recommendation is **write some user documentation for it first** to show in your design doc.
+If you’re working on a new infrastructure project (i.e. your customers are other developers), then my strong recommendation is **write the user documentation for it first** in your design doc.
 
 Consider CLI tooling, library interfaces, config file formats etc - anything the user will interact with or depend on. Try sketching out what this looks like in a design doc up front - before spending weeks implementing it.
 
