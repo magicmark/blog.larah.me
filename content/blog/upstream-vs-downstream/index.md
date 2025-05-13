@@ -28,7 +28,21 @@ For example, in this request diagram, we could say:
 
 # "You're wrong, it depends on which way you look at it"
 
-Upstream vs downstream can indeed be flipped depending on if you're talking about a request or a response. But nobody ever does that and just says "downstream" or "upstream" without the added context of a direction. So for places where we're picking a word without the directional context, "upstream" seems correct given usage of it in other places (e.g. nginx makes you configure "upstreams" referring to the proxy target, a git upstream etc)
+Upstream vs downstream can indeed be flipped depending on if you're talking about a request or a response. But nobody ever does that and just says "downstream" or "upstream" without the added context of a direction.
+
+So for places where we're picking a word without the directional context, "upstream" seems correct given usage of it in other places (e.g. nginx makes you configure "upstreams" referring to the proxy target, a git upstream etc)
+
+Finally, here's how RFC2616 defines the 502 Status Code:
+
+```
+10.5.3 502 Bad Gateway
+
+   The server, while acting as a gateway or proxy, received an invalid
+   response from the upstream server it accessed in attempting to
+   fulfill the request.
+```
+
+If "upstream" is good enough for RFC2616, it's good enough for me.
 
 # Cool! I'll tell all my friends and family and use "upstream/downstream" correctly in my RFCs!
 
