@@ -1,6 +1,6 @@
 ---
 title: Never say "it didn't work"
-date: '2020-05-13T12:00:00.284Z'
+date: '2025-05-13T12:00:00.284Z'
 description: Be explicit when asking for technical support.
 ---
 
