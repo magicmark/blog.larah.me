@@ -4,7 +4,7 @@ date: '2025-05-13T12:00:00.284Z'
 description: Be explicit when asking for technical support.
 ---
 
-When asking for help in a support channel, or filing an bug report ticket, my simple rule is:
+When asking for help in a support channel, or filing a bug report ticket, my simple rule is:
 
 **Avoid the phrase “it didn’t work”**.
 
