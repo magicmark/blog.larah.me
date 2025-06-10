@@ -1,4 +1,3 @@
-
 ---
 title: "Creating 'mess' directories"
 date: '2025-06-09T21:21:00.284Z'
