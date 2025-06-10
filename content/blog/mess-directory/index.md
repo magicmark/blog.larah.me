@@ -1,8 +1,8 @@
 
 ---
-title: Creating 'mess' directories
+title: "Creating 'mess' directories"
 date: '2025-06-09T21:21:00.284Z'
-description: Include this in .bashrc to quickly create a 'mess' directory
+description: "Include this in .bashrc to quickly create a 'mess' directory"
 ---
 
 Here's a snippet from my `.zshrc` that I use pretty much every day:
