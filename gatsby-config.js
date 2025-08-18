@@ -2,13 +2,15 @@ module.exports = {
     siteMetadata: {
         title: `blog.larah.me`,
         author: `Mark Larah`,
-        description: `A blog about JavaScript, Baking and who knows what else.`,
+        description: `A blog about JavaScript, Node, GrapQL and general web infra dev.`,
         siteUrl: `https://blog.larah.me`,
         social: {
             twitter: `mark_larah`,
         },
     },
+    trailingSlash: 'always',
     plugins: [
+        'gatsby-plugin-image',
         'gatsby-plugin-meta-redirect',
         {
             resolve: 'gatsby-source-filesystem',
@@ -35,12 +37,6 @@ module.exports = {
                         },
                     },
                     {
-                        resolve: `gatsby-remark-image-attributes`,
-                        options: {
-                            dataAttributes: true,
-                        },
-                    },
-                    {
                         resolve: 'gatsby-remark-responsive-iframe',
                         options: {
                             wrapperStyle: 'margin-bottom: 1.0725rem',
@@ -49,6 +45,7 @@ module.exports = {
                     'gatsby-remark-prismjs',
                     'gatsby-remark-copy-linked-files',
                     'gatsby-remark-smartypants',
+                    'gatsby-remark-numbered-footnotes',
                 ],
             },
         },
@@ -60,7 +57,43 @@ module.exports = {
                 trackingId: 'UA-64692179-3',
             },
         },
-        'gatsby-plugin-feed',
+        {
+            resolve: 'gatsby-plugin-feed',
+            options: {
+                feeds: [
+                    {
+                        serialize: ({ query: { site, allMarkdownRemark } }) => {
+                            return allMarkdownRemark.nodes.map(node => {
+                                return Object.assign({}, node.frontmatter, {
+                                    description: node.excerpt,
+                                    date: node.frontmatter.date,
+                                    url: site.siteMetadata.siteUrl + node.fields.slug,
+                                    guid: site.siteMetadata.siteUrl + node.fields.slug,
+                                    custom_elements: [{ "content:encoded": node.html }],
+                                })
+                            })
+                        },
+                        query: `{
+                            allMarkdownRemark(sort: {frontmatter: {date: DESC}}) {
+                                nodes {
+                                    excerpt
+                                    html
+                                    fields {
+                                        slug
+                                    }
+                                    frontmatter {
+                                        title
+                                        date
+                                    }
+                                }
+                            }
+                        }`,
+                        output: "/rss.xml",
+                        title: "blog.larah.me RSS Feed",
+                    },
+                ],
+            },
+        },
         {
             resolve: 'gatsby-plugin-manifest',
             options: {
