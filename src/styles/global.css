@@ -1,0 +1,147 @@
+/* Global theme variables */
+:root {
+  /* Solarized Light Theme */
+  --bg-primary: #fdf6e3;
+  --bg-highlight: #eee8d5;
+  --text-primary: #657b83;
+  --text-secondary: #93a1a1;
+  --text-emphasized: #586e75;
+  --text-accent: #268bd2;
+  --text-yellow: #b58900;
+  --text-orange: #cb4b16;
+  --text-red: #dc322f;
+  --text-magenta: #d33682;
+  --text-violet: #6c71c4;
+  --text-cyan: #2aa198;
+  --text-green: #859900;
+}
+
+.dark-theme {
+  /* Solarized Dark Theme */
+  --bg-primary: #002b36;
+  --bg-highlight: #073642;
+  --text-primary: #839496;
+  --text-secondary: #657b83;
+  --text-emphasized: #93a1a1;
+  --text-accent: #268bd2;
+  --text-yellow: #b58900;
+  --text-orange: #cb4b16;
+  --text-red: #dc322f;
+  --text-magenta: #d33682;
+  --text-violet: #6c71c4;
+  --text-cyan: #2aa198;
+  --text-green: #859900;
+}
+
+/* Global styles */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Enhanced code syntax highlighting with Solarized */
+.gatsby-highlight {
+  background-color: var(--bg-highlight);
+  border-radius: 0.3em;
+  margin: 0.5em 0;
+  padding: 1em;
+  overflow: auto;
+}
+
+.gatsby-highlight pre[class*="language-"] {
+  background-color: transparent;
+  margin: 0;
+  padding: 0;
+  overflow: initial;
+  float: left;
+  min-width: 100%;
+}
+
+/* PrismJS Solarized Theme Override */
+code[class*="language-"],
+pre[class*="language-"] {
+  color: var(--text-primary);
+  background: none;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+  tab-size: 4;
+  hyphens: none;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.token.punctuation {
+  color: var(--text-primary);
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: var(--text-red);
+}
+
+.token.boolean,
+.token.number {
+  color: var(--text-cyan);
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: var(--text-green);
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+  color: var(--text-yellow);
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+  color: var(--text-accent);
+}
+
+.token.keyword {
+  color: var(--text-violet);
+}
+
+.token.regex,
+.token.important {
+  color: var(--text-orange);
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}

@@ -27,35 +27,41 @@ const Bio = () => {
 
     const { author, social } = data.site.siteMetadata;
     return (
-        <div
-            style={{
-                display: `flex`,
-                marginBottom: rhythm(2.5),
-            }}
-        >
-            <StaticImage
-                src="../../content/assets/mark.jpg"
-                alt={author}
-                placeholder="blurred"
-                width={50}
-                height={50}
+        <div style={{ display: 'flex' }}>
+            <div
                 style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: '50%',
+                    overflow: 'hidden',
                     marginRight: rhythm(1 / 2),
-                    marginBottom: 0,
-                    minWidth: 50,
-                    borderRadius: `100%`,
+                    flex: '0 0 56px',
                 }}
-                imgStyle={{
-                    borderRadius: `50%`,
-                }}
-            />
+            >
+                <StaticImage
+                    src="../../content/assets/mark.jpg"
+                    alt={author}
+                    placeholder="blurred"
+                    layout="fixed"
+                    width={112}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        margin: 0,
+                    }}
+                    imgStyle={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center',
+                        margin: 0,
+                    }}
+                />
+            </div>
+
             <p>
-                Written by <strong>{author}</strong> who lives and works in Austin, TX
-                building occasionally useful things.
-                {` `}
-                <a href={`https://x.com/${social.twitter}`}>
-                    You should follow him on Twitter!
-                </a>
+                Written by <strong>{author}</strong> who lives and works in Austin, TX. <br />
+                <a href={`https://x.com/${social.twitter}`}>Follow me on Twitter!</a>
             </p>
         </div>
     );
