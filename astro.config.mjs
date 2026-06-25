@@ -26,20 +26,8 @@ export default defineConfig({
 		],
 	},
 	redirects: {
-		'/asking-for-help-on-slack/': '/blog/asking-for-help-on-slack/',
-		'/dont-rethrow-new-Error-error/': '/blog/dont-rethrow-new-error-error/',
-		'/mess-directory/': '/blog/mess-directory/',
-		'/mocking-with-unionfs-and-jest/': '/blog/mocking-with-unionfs-and-jest/',
-		'/never-say-it-didnt-work/': '/blog/never-say-it-didnt-work/',
-		'/pop-the-hood/': '/blog/pop-the-hood/',
-		'/prefer-having-discussions-in-public/': '/blog/prefer-having-discussions-in-public/',
-		'/react-server-side-rendering/': '/blog/react-server-side-rendering/',
-		'/teach-to-fish/': '/blog/teach-to-fish/',
-		'/upstream-vs-downstream/': '/blog/upstream-vs-downstream/',
-		'/write-explicit-type-guards/': '/blog/write-explicit-type-guards/',
-		'/write-the-docs-first/': '/blog/write-the-docs-first/',
 		// Old blog URL format redirect
-		'/2017/04/10/react-server-side-rendering': '/blog/react-server-side-rendering/',
+		'/2017/04/10/react-server-side-rendering': '/react-server-side-rendering/',
 	},
 	fonts: [
 		{
