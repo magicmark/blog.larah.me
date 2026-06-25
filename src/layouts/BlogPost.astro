@@ -74,6 +74,12 @@ const { title, description, pubDate, updatedDate, heroImage, slug } = Astro.prop
 			.edit-link a:hover {
 				color: var(--accent);
 			}
+			@media (max-width: 720px) {
+				.prose {
+					max-width: 100%;
+					padding: 0.5em;
+				}
+			}
 		</style>
 	</head>
 
