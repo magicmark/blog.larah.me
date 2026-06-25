@@ -44,6 +44,27 @@ h6 {
 	margin: 0 0 0.5rem 0;
 	color: rgb(var(--black));
 	line-height: 1.2;
+	position: relative;
+}
+
+.heading-anchor {
+	position: absolute;
+	left: -1.5em;
+	color: rgb(var(--gray));
+	opacity: 0;
+	transition: opacity 0.15s;
+	cursor: pointer;
+	font-weight: normal;
+	text-decoration: none;
+}
+
+h1:hover .heading-anchor,
+h2:hover .heading-anchor,
+h3:hover .heading-anchor,
+h4:hover .heading-anchor,
+h5:hover .heading-anchor,
+h6:hover .heading-anchor {
+	opacity: 1;
 }
 h1 {
 	font-size: 3.052em;

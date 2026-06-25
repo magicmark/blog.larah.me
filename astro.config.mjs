@@ -2,6 +2,8 @@
 
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeSlug from 'rehype-slug';
 import { defineConfig, fontProviders } from 'astro/config';
 
 // https://astro.build/config
@@ -9,6 +11,20 @@ export default defineConfig({
 	site: 'https://blog.larah.me',
 	trailingSlash: 'always',
 	integrations: [mdx(), sitemap()],
+	markdown: {
+		rehypePlugins: [
+			rehypeSlug,
+			[rehypeAutolinkHeadings, {
+				behavior: 'prepend',
+				content: {
+					type: 'element',
+					tagName: 'span',
+					properties: { className: ['heading-anchor'], ariaHidden: 'true' },
+					children: [{ type: 'text', value: '#' }],
+				},
+			}],
+		],
+	},
 	redirects: {
 		'/asking-for-help-on-slack/': '/blog/asking-for-help-on-slack/',
 		'/dont-rethrow-new-Error-error/': '/blog/dont-rethrow-new-error-error/',
