@@ -83,15 +83,12 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		</main>
 		<Footer />
 		<script>
-			document.querySelectorAll('.heading-anchor').forEach((anchor) => {
-				anchor.addEventListener('click', (e) => {
+			document.querySelectorAll('.prose h1[id], .prose h2[id], .prose h3[id], .prose h4[id], .prose h5[id], .prose h6[id]').forEach((heading) => {
+				heading.addEventListener('click', (e) => {
 					e.preventDefault();
-					const heading = anchor.closest('h1, h2, h3, h4, h5, h6');
-					if (heading && heading.id) {
-						const url = `${window.location.origin}${window.location.pathname}#${heading.id}`;
-						window.location.hash = heading.id;
-						navigator.clipboard.writeText(url);
-					}
+					const url = `${window.location.origin}${window.location.pathname}#${heading.id}`;
+					window.location.hash = heading.id;
+					navigator.clipboard.writeText(url);
 				});
 			});
 		</script>
