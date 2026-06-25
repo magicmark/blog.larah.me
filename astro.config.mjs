@@ -6,7 +6,6 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeSlug from 'rehype-slug';
 import { defineConfig, fontProviders } from 'astro/config';
 
-// https://astro.build/config
 export default defineConfig({
 	site: 'https://blog.larah.me',
 	trailingSlash: 'always',
@@ -26,7 +25,6 @@ export default defineConfig({
 		],
 	},
 	redirects: {
-		// Old blog URL format redirect
 		'/2017/04/10/react-server-side-rendering': '/react-server-side-rendering/',
 	},
 	fonts: [

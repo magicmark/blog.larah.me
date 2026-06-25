@@ -16,12 +16,9 @@ const { title, description, pubDate, updatedDate, heroImage, slug } = Astro.prop
 		<BaseHead title={title} description={description} />
 		<style>
 			main {
-				width: calc(100% - 2em);
+				width: 100%;
 				max-width: 100%;
 				margin: 0;
-			}
-			.hero-image {
-				width: 100%;
 			}
 			.hero-image img {
 				display: block;
@@ -65,7 +62,6 @@ const { title, description, pubDate, updatedDate, heroImage, slug } = Astro.prop
 			}
 			.edit-link {
 				font-size: 0.85em;
-				color: rgb(var(--gray));
 			}
 			.edit-link a {
 				color: rgb(var(--gray));
@@ -75,9 +71,6 @@ const { title, description, pubDate, updatedDate, heroImage, slug } = Astro.prop
 				color: var(--accent);
 			}
 			@media (max-width: 720px) {
-				main {
-					width: 100%;
-				}
 				.prose {
 					max-width: 100%;
 					padding: 0.5em;
