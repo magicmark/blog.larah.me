@@ -75,19 +75,19 @@ h6:hover .heading-anchor {
 	text-underline-offset: 0.15em;
 }
 h1 {
-	font-size: 3.052em;
+	font-size: 2.5em;
 }
 h2 {
-	font-size: 2.441em;
+	font-size: 1.75em;
 }
 h3 {
-	font-size: 1.953em;
+	font-size: 1.35em;
 }
 h4 {
-	font-size: 1.563em;
+	font-size: 1.1em;
 }
 h5 {
-	font-size: 1.25em;
+	font-size: 1em;
 }
 strong,
 b {
@@ -136,16 +136,16 @@ hr {
 		padding: 0.75em 0.5em;
 	}
 	h1 {
-		font-size: 1.8em;
+		font-size: 1.75em;
 	}
 	h2 {
-		font-size: 1.5em;
+		font-size: 1.35em;
 	}
 	h3 {
-		font-size: 1.25em;
+		font-size: 1.15em;
 	}
 	h4 {
-		font-size: 1.1em;
+		font-size: 1em;
 	}
 	.heading-anchor {
 		display: none;
