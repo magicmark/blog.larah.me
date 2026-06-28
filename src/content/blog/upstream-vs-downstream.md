@@ -11,7 +11,7 @@ From RFC 2616 Section 1.3:
 
 https://datatracker.ietf.org/doc/html/rfc2616#section-1.3:~:text=of%20an%20entity.-,upstream/downstream,-Upstream%20and%20downstream
 
-# Is it "upstream" or "downstream"?
+## Is it "upstream" or "downstream"?
 
 Here's a request diagram of your web stack:
 
@@ -26,7 +26,7 @@ For example, in this request diagram, we could say:
 - _The REST API is upstream of nginx_
 - _The BFF Service is downstream of MySQL_
 
-# "You're wrong, it depends on which way you look at it"
+## "You're wrong, it depends on which way you look at it"
 
 Upstream vs downstream can indeed be flipped depending on if you're talking about a request or a response. But nobody ever does that and just says "downstream" or "upstream" without the added context of a direction.
 
@@ -44,7 +44,7 @@ Finally, here's how RFC2616 defines the 502 Status Code:
 
 If "upstream" is good enough for RFC2616, it's good enough for me.
 
-# Cool! I'll tell all my friends and family and use "upstream/downstream" correctly in my RFCs!
+## Cool! I'll tell all my friends and family and use "upstream/downstream" correctly in my RFCs!
 
 Or...not!
 
@@ -54,7 +54,7 @@ So - for the sake of clarity, consider using non-ambiguous english - e.g. **"ser
 
 🎉
 
-# Prior art
+## Prior art
 
 - https://twitter.com/JemYoung/status/1352349935933419521
 - https://stackoverflow.com/questions/32364579/upstream-downstream-terminology-used-backwards-e-g-nginx/32365658#32365658
