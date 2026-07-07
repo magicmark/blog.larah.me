@@ -306,7 +306,7 @@ GraphQL clients are widely already across many languages:
 
 👉 <span class="highlight"><a href="https://graphql.org/community/tools-and-libraries/?tags=client">https://graphql.org/community/tools-and-libraries/?tags=client</a></span>
 
-(If you don't find a suitable client for your language, please comment on this post!)
+(If you don't find a suitable client for your language, please comment!)
 
 Maintaining one thing is easier than maintaining multiple things. In short: 
 
