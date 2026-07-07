@@ -7,72 +7,113 @@ description: |
 ---
 
 I gave a [talk at GraphQL Conf 2026][talk] about using GraphQL for
-service-to-service communication. This post is a (shorter!) written version of
-that talk.
+service-to-service communication. This post is a condensed written version of
+those thoughts.
 
 [talk]: https://graphqlconf2026.sched.com/event/2IPbF/service-to-service-graphql-the-new-sweet-spot-mark-larah-yelp
 
-**tl;dr**: If you're already investing in a GraphQL API for public clients,
-using it for internal service communication is _not_ necessarily an anti-pattern.
-I would argue in many cases, it's actually the most pragmatic choice :)
+**tl;dr**: Using GraphQL for service-to-service communication is not an
+anti-pattern. This is especially true if your org already uses GraphQL for
+mobile and web clients — consolidating on GraphQL as a single API surface is a
+very compelling option.
 
-Specifically, this is where I think it makes the most sense:
+Specifically, here's where I think it makes the most sense:
 
 ![](/images/service-to-service-graphql/ideal_conditions.png max-height=400 center)
 
 <br />
 
-## Historical Context
+### Use Cases
 
-GraphQL is typically sold (exclusively) as a solution for client-to-service
-communication. See: Marc-Andre's excellent blog post:
-["The GraphQL Sweet Spot"](https://productionreadygraphql.com/blog/2020-05-14-sweetspot).
-To be clear, I still largely agree with this! Client-to-service is where the
-built-in benefits of GraphQL pay off most (e.g. collocating UI components with
-Fragments for declarative data fetching, normalized caching in clients, client
-defined field selection).
+Here are some good candidates in particular for using GraphQL on the backend:
+
+**Server Driven UI:** This is a pattern employed at companies such as
+[Netflix][netflix], [Airbnb][airbnb] and [Yelp][yelp] to enable the server to
+make decisions about what UI widgets are displayed on the client. In many
+cases, the SDUI payload sent to the client contains the data already embedded
+into the component. Which means the SDUI backend service needs data from
+somewhere...
+
+[netflix]: https://graphqlconf2026.sched.com/event/2IPcY/screens-on-shuffle-how-netflix-scales-serverdriven-everchanging-pages-sreekanth-ramakrishnan-netflix
+[airbnb]: https://medium.com/airbnb-engineering/a-deep-dive-into-airbnbs-server-driven-ui-system-842244c5f5
+[shopify]: https://shopify.engineering/server-driven-ui-in-shop-app
+[yelp]: https://engineeringblog.yelp.com/2024/03/chaos-yelps-unified-framework-for-server-driven-ui.html
+
+**LLM Driven UI:** A special case of the above -- pages driven by LLMs
+(typically conversational UIs). The model needs product and user data in order
+to generate a response. This could be via MCP, or some prefetched data baked
+into initial context. Either way - we have a service that needs data!
+
+**React Server Components:** This one feels like cheating, but still counts!
+There's already [native client support][apollo-rsc].
+
+[apollo-rsc]: https://www.apollographql.com/docs/react/integrations/nextjs#react-server-components
+
+In all cases above, the data we provide may ultimately be displayed to end users.
+Therefore it needs to have the same business logic and auth checks applied as
+your existing external API - otherwise we risk leaking private information through
+the model and back out to the user. So from a safety perspective alone, it would
+be nice to directly reuse the external GraphQL API which already handles these
+concerns... on the server :)
+
+## The case _against_ service-to-Service GraphQL
 
 If we're evaluating the "best" data transport protocol _purely_ for
-service-to-service, binary protocols "win" on raw performance alone (e.g.
-[gRPC](https://grpc.io/), [cap'n'proto](https://capnproto.org/),
-[bebop](https://github.com/6over3/bebop) to name a few).
+service-to-service use cases, binary protocols offer an excellent developer
+experience, and win on raw performance alone (e.g. [gRPC](https://grpc.io/),
+[cap'n'proto](https://capnproto.org/), [bebop](https://github.com/6over3/bebop)
+to name a few). More commonly used however, are old-fashioned REST endpoints
+(ideally typed with Swagger/OpenAPI or similar).
 
-One might reasonably assume the implication of these common wisdoms is that the
-best architecture would be to combine these approaches, i.e. a public GraphQL
-API layered over a set of gRPC service endpoints. This is largely how GraphQL
-originally evolved at many companies (although more commonly with REST).
+A ["boring"][boring] stack would reasonably be:
 
-More recently however, the industry has shifted towards
-[GraphQL Federation][federation] as a way to deploy and orchestrate GraphQL
-across multiple services, replacing the need to wrap endpoints. So you may
-already have GraphQL resolvers in your services, and therefore _technically_
-already be doing service-to-service GraphQL, via the Federation Router! :)
+- REST or gRPC for service-to-service communication
+- GraphQL for client-to-service communication <small>(Yes, I think GraphQL counts as boring now!)</small>
+
+[boring]: https://mcfunley.com/choose-boring-technology
+
+The natural next step is combining these: an external GraphQL API layered over a
+set of internal endpoints. This is indeed largely how GraphQL evolved and has
+been deployed at many companies.
+
+More recently however, the industry has shifted towards [GraphQL
+Federation][federation] as a way to deploy and orchestrate GraphQL across
+multiple services -- replacing the need to wrap endpoints with a big GraphQL
+proxy service.
 
 [federation]: https://graphql.org/resources/federation/
 
-So, do we still need multiple APIs? Keep REST/gRPC for internal services and
-GraphQL for public clients? Let's look at the code-overhead of doing so.
+Which leads me to wonder: do we still need multiple APIs? Can we just reuse the
+GraphQL resolvers for internal service use cases too? Surely this is blasphemy!
 
-## Maintaining Multiple APIs
+### "No! GraphQL is for clients only. Keep separate APIs."
 
-Assuming we now have both GraphQL resolvers _and_ existing gRPC/REST endpoints,
-we have (at least) two APIs over the same sets of data. The trap we might fall
-into is this -- duplicated data definitions over the same underlying data.
+In a situation where we maintain GraphQL resolvers _and_ existing gRPC/REST
+endpoints, we have (at least) two APIs over the same sets of data. The trap we
+might fall into is this -- duplicated data definitions over the same underlying
+data.
 
 ![](/images/service-to-service-graphql/avoid.png)
 
 Clearly it would be a bad idea to duplicate API handler logic over the same data
 types each time. A separate [business logic layer][logic-layer] and/or using
-code generation tools such as [ent][entgo] or [TypeSpec][typespec] is a well
-established pattern to keep things as DRY as possible. This certainly helps,
+code generation tools such as [ent][entgo] or [TypeSpec][typespec] are well
+established patterns to keep things DRY and consistent. This certainly helps,
 but some logic cannot easily be normalized into a shared abstraction.
 
 [entgo]: https://entgo.io/docs/code-gen
 [typespec]: https://github.com/microsoft/typespec/issues/4933
+[logic-layer]: https://graphql.org/learn/thinking-in-graphs/#business-logic-layer
 
-### Per-API differences
+We still end up with:
 
-One such example is error handling. Our internal REST API might simply do this:
+- Per-API schema definitions (e.g. A GraphQL schema and an OpenAPI Contract)
+- Different error handling patterns per API
+- Different fields exposed for different use cases
+- Features that don't map cleanly to a shared abstraction (e.g. `@skip`/`@include`)
+
+For instance, let's take a closer look at error handling. The internal REST API
+might simply raise a 404:
 
 ```python
 @router.get("/business/{id}")
@@ -87,15 +128,10 @@ def get_business(
            detail=f"Business {id} not found"
        )
 
-    return BusinessResponse(
-        id=business.id,
-        name=business.name,
-        opening_time=str(business.opening_time),
-        closing_time=str(business.closing_time),
-    )
+    return BusinessResponse(**business)
 ```
 
-Whereas our GraphQL resolver over the same data might instead use
+Whereas our GraphQL resolver over the same data might instead return
 [error unions](https://sachee.medium.com/200-ok-error-handling-in-graphql-7ec869aec9bc):
 
 ```python
@@ -113,27 +149,60 @@ class Query:
                 message=f"Business with id {id} not found"
             )
 
-        return Business(
-            id=business.id,
-            name=business.name,
-            is_open=is_open(business.opening_time, business.closing_time),
-        )
+        return Business(**business)
 ```
 
-This would be awkward to bake into the `lookup_business(...)` business logic
-layer. Per-API adaptor logic must be done per-API.
+This difference would be awkward to bake into the `lookup_business(...)`
+business logic layer. Per-API adaptor logic must be done per-API.
 
-Oh by the way... also note that the REST endpoint returns the raw `opening_time`
-and `closing_time` fields, whereas the GraphQL resolver returns a _derived field_
-`is_open`. Oops! Without strict shared codegen, the data types that the public
-and private APIs emit will likely drift apart based on the internal vs public
-demands for data. This isn't necessarily a problem in itself and could be
-considered natural layering of concerns, but does imply more per-API differences
-and logic that lives outside a shared abstraction.
+Let's also zoom into the differences between the fields the external (GraphQL) and
+an internal (REST) service might return for the same domain object:
 
-### Just use GraphQL
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+<div>
 
-What if we consolidated on GraphQL? And let all client types, regardless of
+<p style="margin-bottom: -0.5em;"><strong>External GraphQL API</strong></p>
+
+```graphql
+type Business {
+  name: String!
+  phoneNumber: String!
+  isOpen: Boolean!
+}
+```
+
+</div>
+<div>
+
+<p style="margin-bottom: -0.5em;"><strong>Internal REST Service</strong></p>
+
+```python
+class BusinessResponse(pydantic.BaseModel):
+    name: str
+    phone_number: str
+    opening_time: str
+    closing_time: str
+```
+
+</div>
+</div>
+
+How many differences can you see?
+
+The internal version exposes raw `openingTime` and `closingTime` values -- but
+real users can only see a computed `isOpen` boolean field (which
+takes into account the user's timezone).
+
+But did you also spot the difference in `phoneNumber`? Trick question! It looks
+the same, but could actually be a totally different value -- because for some
+businesses, we need to substitute a _[call reporting
+number](https://biz.yelp.com/support-center/Advertising_on_Yelp/Yelp_Ads/What-is-Call-Reporting/en-US)_
+instead when displaying to users via the external API. Values that look the same
+but are subtly different across different APIs becomes very confusing.
+
+## GraphQL to the rescue
+
+What if we consolidated on GraphQL, and let all client types, regardless of
 who or where they are in your application stack all fetch (mostly) the same data
 from the same API? 😱
 
@@ -142,264 +211,135 @@ type Business {
   id: ID!
   name: String!
   isOpen: Boolean!
-  openingTime: String! @auth(role: [BUSINESS_OWNER])
-  closingTime: String! @auth(role: [BUSINESS_OWNER])
+  openingTime: String! @internalOnly
+  closingTime: String! @internalOnly
+  phoneNumber: String!
+  phoneNumberRaw: String! @internalOnly
 }
 ```
 
-In this world, we throw everything in GraphQL - both the public and private
-fields. In GraphQL, fields are only fetched and executed on the server if they
-were selected in the query - i.e. there's no risk to defining all fields an
-object type might contain.
+Throw everything in GraphQL -- both the external and internal-only fields.
 
-For data that was formerly private and inaccessible to public users, an [`@auth`
+To be clear:
+
+- Private fields are kept private via the `@internalOnly` directive.
+- Fields aren't executed unless requested in a query, so there's no performance
+  penalty for including them all in the schema.
+- Separation of concerns between private and external fields can be further
+  enforced using _Schema Contracts_ — a common vendor feature* to ship different
+  slices of the schema to different consumers. This could be applied here, to
+  omit private-only field visibility entirely from the external schema.
+  (<small>*[Apollo](https://www.apollographql.com/docs/graphos/platform/schema-management/delivery/contracts/overview), 
+  [WunderGraph](https://cosmo-docs.wundergraph.com/concepts/schema-contracts), 
+  [Hive](https://the-guild.dev/graphql/hive/docs/schema-registry/contracts)</small>)
+
+Better yet, instead of `@internalOnly`, use an [`@auth`
 directive](https://graphql.org/learn/authorization/#using-type-system-directives)
-(or similar) may be used to restrict public users from ever being to receive a
-private-only field -- allowing more granular access controls than a simple
-"private" vs "public" split. And for even more separation, _Schema Contracts_
-are a common vendor feature* to ship different slices of the schema to different
-consumers. This would apply well here to omit any known private-only fields
-entirely from the public schema.
-(<small>[Apollo](https://www.apollographql.com/docs/graphos/platform/schema-management/delivery/contracts/overview) [WunderGraph](https://cosmo-docs.wundergraph.com/concepts/schema-contracts) [Hive](https://the-guild.dev/graphql/hive/docs/schema-registry/contracts)</small>)
-
-## Use Cases
-
-## REST is stinky
-
-But what about "direct" service-to-service use cases?
-
-
-Even with a compile step or [shared modelling](https://typespec.io/),
-
- - some amount per-API code is
-required.
-
-abstraction.
-
-Here are two such examples.
-
-### Example 1: Derived Fields
-
-Almost inevitably, the data models that the public and private APIs use will
-diverge. Even with a compile step or [shared modelling](https://typespec.io/),
-the difference in who consumes each API will surface the need to have different
-fields on types (or worse, entirely different and overlapping types).
-
-Consider the raw `Business` database model for a reviews website (such as Yelp):
-
-```js
-interface BusinessModel {
-  id: string;
-  name: string;
-  phone_number: string;
-}
-```
-
-The internal REST endpoint version for this data might expose the model as-is:
-
-```python
-@router.get("/business/{id}")
-def get_business(
-   id: int,
-) -> BusinessResponse:
-    # talk to the database, do business logic, etc:
-    business = lookup_business(id)
-
-    return BusinessResponse(
-        id=business.id,
-        name=business.name,
-        phone_number=business.phone_number,
-    )
-```
-
-But watch out! At Yelp, businesses can enable the
-"[Call Reporting][call-reporting]" feature, where the UI should display a
-proxied phone number instead of the raw phone number. Which means the public API
-(i.e. the GraphQL resolver) does this instead:
-
-```python
-@strawberry.type
-class Query:
-    @strawberry.field
-    def business(self, info, id: strawberry.ID) -> Business:
-        # talk to the database, do business logic, etc:
-        business = lookup_business(id)
-
-        # look up the call tracking version of the phone number
-        # (maybe from some other service with its own REST API)
-        tracking_number = get_call_tracking_number(id)
-
-        return Business(
-            id=business.id,
-            name=business.name,
-            display_phone_number=tracking_number or business.phone_number,
-        )
-```
+(or similar) to enforce granular RBAC or ABAC policies. (And better still,
+define and derive these policies from [higher up in the
+stack][auth-in-logic-layer]... which is the subject of different post 😅)
 
-The call to `get_call_tracking_number(...)` lives outside of the shared
-`lookup_business(...)` abstraction in order to avoid adding over-fetching and
-adding unnecessary latency when calling the internal REST API. i.e. even with
-code-generation tools, we likely will **still run into per-API differences that
-must be handled manually.**
+[auth-in-logic-layer]: https://graphql.org/learn/authorization/#type-and-field-authorization
 
-Or we could introduce a `lookup_business(include_tracking_number: bool)`
-argument that each API sets accordingly. This still requires code differences
-implementation, so doesn't solve
+### Should internal traffic go via the GraphQL Federation Router?
 
-...but how about this instead?
+<details>
 
-```python
-@strawberry.type
-class Query:
-    @strawberry.field
-    def business(self, info, id: strawberry.ID) -> Business:
-        # talk to the database, do business logic, etc:
-        business = lookup_business(id)
+_(You may instead have many individual GraphQL services not connected to any
+shared Router - that's fine too - and in which case, ignore this section!)_
 
-        # look up the call tracking version of the phone number
-        # (maybe from some other service with its own REST API)
-        tracking_number = get_call_tracking_number(id)
+This post talks a lot about Federation, so it’s worth clarifying one related
+question: should internal service-to-service traffic also go through the Router?
 
-        return Business(
-            id=business.id,
-            name=business.name,
-            display_phone_number=tracking_number or business.phone_number,
-        )
-```
+In theory, probably **yes**...but perhaps only when it becomes worthwhile.
 
+From a developer experience perspective, it would be more ideal than manually
+making `n` individual network requests to `n` services. The cost however, is
+added operational complexity: the touter becomes another single-point-of-failure
+for internal service traffic, and may need to be be deployed and advertised
+more locally to keep latency down.
 
-Note:
-- the GraphQL API only exposes `Business.displayPhoneNumber`, whereas the
-  private REST API needs to expose the "raw" phone number for internal
-  administrative use cases.
-- the call to `get_call_tracking_number(...)` lives outside of the
-  `lookup_business` in order to avoid adding over-fetching and adding
-  unnecessary latency when calling the private REST API.
+That said, I think it’s still probably a good idea to use the router internally
+for the following reasons:
 
-`display_phone_number` is a "derived field", and  the call to
-`get_call_tracking_number(...)` lives outside of the `lookup_business` in order
-to avoid adding over-fetching and adding unnecessary latency when calling the
-private REST API.
+- It’s easier to normalize differences between external and internal traffic
+  centrally at the Router, rather than pushing that logic into every subgraph's
+  middleware or individual resolvers.
+- In cases where data is required from multiple services, callsites can write a
+  single query against the supergraph -- instead of manually orchestrating
+  multiple service calls and reimplementing router logic.
+- If internal-only types are never queried through the Router, they may be
+  orphaned and left out of the supergraph schema, which increases the risk of
+  globally duplicated types and composition failures down the line.
 
+- **Centralized normalization:** It’s easier to normalize differences between
+  external and internal traffic centrally at the Router, rather than pushing that
+  logic into every subgraph’s middleware or individual resolvers.
+- **Unified queries:** In cases where data is required from multiple services,
+  callsites can write a single query against the supergraph -- instead of
+  manually orchestrating multiple service calls and reimplementing router logic.
+- **Schema hygiene:** If internal-only types are never queried through the
+  Router, they may be orphaned and left out of the supergraph schema, which
+  increases the risk of globally duplicated types and composition failures down
+  the line.
 
+</details>
 
-This is a basic example. We could of course just always calculate and return
-`displayName` in the shared abstraction with minimal overheard. But there are
-cases where calculating the derived field is expensive - for example, when a
-business has "[Call Reporting][call-reporting]" enabled and we need to look up
-the tracking number version of the phone number from another service.
-Introducing and unnvessary 
+- **Centralized normalization:** It’s easier to normalize differences between
+  external and internal traffic centrally at the Router, rather than pushing that
+  logic into every subgraph’s middleware or individual resolvers.
+- **Unified queries:** In cases where data is required from multiple services,
+  callsites can write a single query against the supergraph -- instead of
+  manually orchestrating multiple service calls and reimplementing router logic.
+- **Schema hygiene:** If internal-only types are never queried through the
+  Router, they may be
+  orphaned and left out of the supergraph schema, which increases the risk of
+  globally duplicated types and composition failures down the line.
 
-but there are many other examples of derived fields where looking up  
+Can easier leverage the existing schema breaking change detection features.
 
-  `phone_number` becomes a _derived field_.
-A business may have the "[Call Reporting][call-reporting]" feature enabled,
-meaning that the phone number displayed in the UI should be a proxied phone
-number, not the raw phone number. Which means that the public GraphQL API must
-look like this:
+## Honorable mentions
 
-[call-reporting]: https://biz.yelp.com/support-center/Advertising_on_Yelp/Yelp_Ads/What-is-Call-Reporting/en-US
+I didn't have time to mention these in my talk, but I wanted to do mention some
+other solutions in this space which may also fit your use case.
 
+### Cosmo Connect + Apollo Connectors
 
-@router.get("/business/{id}")
-def get_business(
-   id: int,
-) -> BusinessResponse:
-   user_id = g.context.user_id
-   business = business_from_id(session, user_id, id)
+The idea of "maintain a single API but expose it on multiple platforms" can also
+be achieved by making the GraphQL layer on top of endpoints.
 
-   if business is None:
-       raise HTTPException(
-           status_code=404,
-           detail=f"Business with id {id} not found"
-       )
+**[Cosmo Router's support for gRPC
+Services](https://cosmo-docs.wundergraph.com/router/gRPC/grpc-services)** offers
+a very compelling alternative if you're already in the gRPC ecosystem and wish
+to only write and maintain gRPC endpoints. tl;dr you write `.graphql` schemas
+that codegen to `.proto` files; the Federation router knows how to translate the
+request and make native gRPC calls to your service.
 
-    return BusinessResponse(
-        id=business.id,
-        name=business.name,
-        opening_time=str(business.opening_time),
-        closing_time=str(business.closing_time),
-    )
+Similarly, [Apollo
+Connectors](https://www.apollographql.com/docs/graphos/connectors/requests)
+provide native support to the Apollo Gateway for calling HTTP Services by
+defining mappings via the `@connect` directive.
 
+And for at GraphQLConf 2025, LinkedIn demonstrated their custom `.proto` ->
+`.graphql` translation layer. In theory, this could be plugged into a
+supergraph.
 
-At Yelp, `phone_number` may actually be a _derived field_. A business may have
-"[Call Reporting](https://biz.yelp.com/support-center/Advertising_on_Yelp/Yelp_Ads/What-is-Call-Reporting/en-US)"
-enabled, meaning that the phone number displayed in the UI should be a proxied
-phone number, not the raw phone number. And if a different service knows about
-this
+Although this isn't open sourced (as far as I can
+tell), it's another interesting "reverse" approach to the above, and could in
+theory be plugged into a router as a subgraph.
 
+This is not a sponsored blog post; I haven't personally used any of these
+options. But 
 
+### Ent
 
+### Entity Frameworks
 
-But trusted internal services still need to be able to access the raw
-phone number for admin panels and such.
+https://cosmo-docs.wundergraph.com/router/gRPC/grpc-services
 
+### Cap'n'web
 
-the private API emit diverge. Even if you're using a shared  
-
-### Example 2: Error Handling
-
-Consider this REST endpoint
-
-@router.get("/business/{id}")
-def get_business(
-   id: int,
-) -> BusinessResponse:
-   user_id = g.context.user_id
-   business = business_from_id(session, user_id, id)
-
-   if business is None:
-       raise HTTPException(
-           status_code=404,
-           detail=f"Business with id {id} not found"
-       )
-
-    return BusinessResponse(
-        id=business.id,
-        name=business.name,
-        opening_time=str(business.opening_time),
-        closing_time=str(business.closing_time),
-    )
-
-
-
-We can normalize most of the logic, but there 
-
-
-Such per-API logic leaks beyond the shared abstraction. 
-
-[logic-layer]: https://graphql.org/learn/thinking-in-graphs/#business-logic-layer
-
-Consider a "Business" model for a reviews website (such as Yelp):
-
-```js
-interface Business {
-  id: string;
-  name: string;
-  phone_number: string;
-  is_open: boolean;
-}
-```
-
-At Yelp, `phone_number` may actually be a _derived field_. A business may have
-the "[Call Reporting][call-reporting]" feature enabled, meaning that the phone
-number displayed in the UI should be a proxied phone number, not the raw phone
-number. But trusted internal services still need to be able to access the raw
-phone number for admin panels and such.
-
-The internal REST/gRPC data type must 
-
-[call-reporting]: https://biz.yelp.com/support-center/Advertising_on_Yelp/Yelp_Ads/What-is-Call-Reporting/en-US
-
-That means we can't
-pipe the data straight out of a column in the database.
-data objects, whereas the public clients (mobile and web clients) may only  "derived" copies of the same 
-
-boundaries, and the
-
-thin as possible   
-
-## Alternative Solutions
+https://github.com/cloudflare/capnweb
 
 There are some intriguing language or vendor specific options such as [GraphQL->gRPC][wundergraph],
 [gRPC->GraphQL][linkedin] and
@@ -409,117 +349,10 @@ There are some intriguing language or vendor specific options such as [GraphQL->
 
 These are however language or vendor specific. T
 
-While 
 
-The situation 
-The worst case
-Following t
-
-## Raw vs derived fields
-
-In a [service-oriented architecture](https://en.wikipedia.org/wiki/Service-oriented_architecture),
-it is almost always the case that trusted internal services and public clients
-(mobile and web apps) need slightly different versions of data objects.
-
-For example, consider a "Business" type for a reviews website (such as Yelp):
-
-```sql
-CREATE TABLE business (
-  id VARCHAR(255) NOT NULL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  phone_number VARCHAR(255) NOT NULL,
-  is_open BOOLEAN NOT NULL
-);
-```
+## JSON is too inefficient!
 
 
-At Yelp, `phoneNumber` may actually be a _derived field_. A business may have
-the [Call Reporting][call-reporting] feature enabled, meaning that the phone
-number displayed in the UI should be a proxy phone number, not the raw phone
-number.
-
-...
-[call-reporting](https://biz.yelp.com/support-center/Advertising_on_Yelp/Yelp_Ads/What-is-Call-Reporting/en-US)
-
-That means we can't
-pipe the data straight out of a column in the database.
-data objects, whereas the public clients (mobile and web clients) may only  "derived" copies of the same 
-
-boundaries, and the
-trust boundaries are often established 
-
-In a microservices 
-We have "internal" consumers of data (service-to-service) 
-Consider 
-
-
-
-
-by pairing them up (e.g. layering a GraphQL API over a gRPC service endpoints)
-is the ideal approach.
-
-knowlegde
-
-But if we step back and consider a classic
-[service-oriented architecture](https://en.wikipedia.org/wiki/Service-oriented_architecture)
-for a web or mobile application backend, the overall cost of maintaining
-multiple API definitions (over the same data!) must also be taken into account.
-
-## Use cases
-
-Two use cases have been pushing me to rethink this:
-
-**LLM Agents.** If you're building agents that act on behalf of users, those agents need data -- the same business data your client apps already consume through your GraphQL API. The agent needs to look up a business's hours, check a user's bookmarks, read reviews. That's all sitting right there in your schema already.
-
-The key insight is that an LLM agent operating on behalf of a user should be treated like any other client platform. It needs the same auth, the same authorization checks, the same business logic applied to the data. It's just another client alongside iOS, Android, and Web. If you already have a GraphQL API full of your business data, that's exactly what the agent needs.
-
-**Server Driven UI.** When the server decides what UI to render, it also needs to decide what data to fetch. The layout is defined server-side and can change independently of client releases. When the layout changes, the data requirements change, and the backend needs to initiate requests for that data. The server becomes a client.
-
-Both of these cases share a common thread: internal services that need the same data, with the same business logic applied, that your external clients already get from GraphQL.
-
-## The maintenance tax
-
-Say you have a `Business` type. It has a `phone_number` field -- but you can't
-just return the raw database value, because for some businesses you need to
-substitute a "call tracking number". It has `opening_time` and `closing_time`
--- but public-facing clients should see a computed `isOpen` boolean, while admin tools need the raw times.
-
-This is business logic. It lives somewhere.
-
-If you're serving this data through both a GraphQL API and a gRPC service (or REST, or whatever), you need that business logic applied in both places. The typical answer is "extract it into a shared business logic layer" -- and that works, to a point. But you still end up with:
-
-- Duplicated type definitions (GraphQL schema types AND proto message types)
-- Separate marshalling logic for each API
-- Different error handling patterns per API surface
-- Different fields exposed for different use cases
-
-And it gets worse. GraphQL has features that don't map cleanly to a shared abstraction layer: dynamic field selection, dataloaders for batching, `@defer` for streaming, custom directives. The implementations diverge over time. You're maintaining two APIs that serve the same data but have increasingly different internals.
-
-Tools like PostGraphile and Entgo can generate schemas from your data models, which helps. But once you have meaningful business logic beyond CRUD, you're back to writing it by hand somewhere.
-
-## GraphQL as the consolidated API
-
-If you're already running a GraphQL API that handles auth, caching, rate limiting, logging, experiment rollouts, and permission checks -- and internal services need the same data with the same rules -- why build a second API?
-
-Consider a schema like this:
-
-```graphql
-type Business {
-  id: ID!
-  name: String!
-  phone_number: String! @auth(requires: BUSINESS_OWNER)
-  isOpen: Boolean!
-  reviews(first: Int): [Review!]! @auth(requires: AUTHENTICATED)
-}
-```
-
-The `@auth` directives handle field-level permissions. The resolvers contain the business logic (call tracking substitution, open/closed computation). This already exists. It already works for your web and mobile clients. When a cron job needs to send push notifications about businesses, when a webhook handler needs to ingest and validate third-party data, when an LLM agent needs to answer questions about a user's saved places -- they can all hit the same API.
-
-GraphQL has become the business logic layer. And with Federation, you can compose these across teams while keeping backends DRY.
-
-The resolver code isn't fundamentally different from what you'd write in a REST handler anyway. Compare a Strawberry (Python) resolver to a FastAPI endpoint -- the actual business logic is identical. The difference is that with GraphQL, you write it once and serve all your clients, internal and external.
-
-## "But JSON is slow and big!"
 
 This is the objection I hear most. And five years ago it would have been harder to dismiss. But the numbers tell a different story today.
 
