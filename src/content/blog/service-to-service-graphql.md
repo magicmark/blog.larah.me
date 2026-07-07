@@ -323,7 +323,6 @@ shared Router - that's fine too - and in which case, ignore this section.
 This post talks a lot about Federation, so it’s worth clarifying one related
 question: should internal service-to-service traffic also go through the Router?
 
-
 My answer would be **yes** for the following reasons:
 
 - It’s easier to normalize differences between external and internal traffic
@@ -340,7 +339,7 @@ My answer would be **yes** for the following reasons:
 
 The tradeoff is added operational complexity: the router becomes another
 single-point-of-failure for internal service traffic, and may need to be be
-deployed and advertised more locally to keep latency down. 
+deployed and advertised more locally to keep latency down.
 
 If it seems silly and wasteful to introduce yet another proxy service for
 service-to-service traffic (assuming you already have a service mesh) then you
@@ -381,12 +380,24 @@ I haven't personally used any of these offerings. But if you have the luxury of
 starting from scratch, these options  likely offer the least amount of total
 complexity.
 
-### Entity Frameworks'
+### Entity Frameworks + Fancy ORMs
 
-(a.k.a. "fancy ORMs")
+Internally, Meta uses "Ent Framework" ([source](https://www.youtube.com/watch?v=nKp_LUFk8EU))
+behind GraphQL. [ent](https://entgo.io/) is the open source recreation (I don't work at
+Meta, but this is my understanding).
 
-[ent](https://entgo.io/) is an open source version of Meta's internal framework
-I'll mostly talk about ent; the open source version of ent
+Some particularly compelling features that Ent offers:
+
+- **Built in auth policies** -- at the ORM layer, not defined per-API ([docs](https://entgo.io/docs/privacy))
+  - In addition, lower level row level security can and should also be applied - but this is
+    a seperate topic!
+- **Codegen** -- Ent can auto-generate equivalent GraphQL schemas and protobuf schemas + implementation
+- **Hooks and interceptors** -- Can embed business logic rules inside the ORM to share between APIs
+
+You do still have to manually implement the GraphQL resolvers, and some of the per-API differences above still apply.
+
+But if I were starting from scratch with a layered approach (in Go), Ent would be a top contender.
+
 </details>
 
 <details>
