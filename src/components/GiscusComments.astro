@@ -1,0 +1,37 @@
+---
+const { term } = Astro.props;
+---
+
+<section class="giscus-wrapper">
+  <h2>Comments</h2>
+  <script
+    src="https://giscus.app/client.js"
+    data-repo="magicmark/blog.larah.me"
+    data-repo-id="MDEwOlJlcG9zaXRvcnkyMDg2NjY5OTQ="
+    data-category="Announcements"
+    data-category-id="DIC_kwDODHABcs4DACFJ"
+    data-mapping="specific"
+    data-term={term}
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="preferred_color_scheme"
+    data-lang="en"
+    crossorigin="anonymous"
+    async
+  ></script>
+</section>
+
+<style>
+  .giscus-wrapper {
+    margin-top: 3em;
+    padding-top: 1.5em;
+    border-top: 1px solid rgb(var(--gray-light));
+  }
+
+  .giscus-wrapper h2 {
+    margin-top: 0;
+    margin-bottom: 1em;
+  }
+</style>

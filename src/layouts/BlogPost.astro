@@ -4,6 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import GiscusComments from '../components/GiscusComments.astro';
 import Header from '../components/Header.astro';
 
 type Props = CollectionEntry<'blog'>['data'] & { slug?: string };
@@ -89,7 +90,7 @@ const { title, description, pubDate, updatedDate, heroImage, slug } = Astro.prop
 				<div class="prose">
 					<div class="title">
 						<div class="date">
-							<FormattedDate date={pubDate} />
+							Mark Larah · <FormattedDate date={pubDate} />
 							{
 								updatedDate && (
 									<div class="last-updated-on">
@@ -112,6 +113,7 @@ const { title, description, pubDate, updatedDate, heroImage, slug } = Astro.prop
 							</p>
 						</div>
 					)}
+					{slug && <GiscusComments term={slug} />}
 				</div>
 			</article>
 		</main>

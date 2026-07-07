@@ -1,12 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-    <rect width="128" height="128" rx="24" fill="#2337ff" />
-    <g transform="rotate(-8 64 64)">
-        <text x="38" y="92" font-family="monospace" font-size="72" font-weight="bold" fill="#fff" opacity="0.9">M</text>
-        <text x="68" y="92" font-family="monospace" font-size="72" font-weight="bold" fill="#fff" opacity="0.6">L</text>
-    </g>
+    <defs>
+        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff2d87"/>
+            <stop offset="50%" stop-color="#7b2dff"/>
+            <stop offset="100%" stop-color="#2dd4ff"/>
+        </linearGradient>
+        <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fff" stop-opacity="0.3"/>
+            <stop offset="50%" stop-color="#fff" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="letterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#e0e7ff"/>
+        </linearGradient>
+    </defs>
+    <!-- Rounded square background with gradient -->
+    <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+    <!-- Subtle shine overlay -->
+    <rect width="128" height="128" rx="28" fill="url(#shine)"/>
+    <!-- Geometric accent: diagonal slice -->
+    <polygon points="0,128 128,0 128,40 0,128" fill="#fff" opacity="0.06"/>
+    <polygon points="0,128 0,88 128,0 128,20" fill="#fff" opacity="0.04"/>
+    <!-- M letter - bold and chunky with slight perspective -->
+    <path d="M 18 96 L 18 38 L 32 38 L 44 68 L 56 38 L 70 38 L 70 96 L 58 96 L 58 60 L 46 88 L 42 88 L 30 60 L 30 96 Z" fill="url(#letterGrad)" opacity="0.95"/>
+    <!-- L letter - bold and playful, slightly offset -->
+    <path d="M 76 38 L 90 38 L 90 82 L 112 82 L 112 96 L 76 96 Z" fill="url(#letterGrad)" opacity="0.85"/>
+    <!-- Small decorative dot -->
+    <circle cx="108" cy="44" r="6" fill="#ffde59" opacity="0.9"/>
     <style>
         @media (prefers-color-scheme: dark) {
-            rect { fill: #4455ff; }
+            rect:first-of-type { opacity: 0.92; }
         }
     </style>
 </svg>
