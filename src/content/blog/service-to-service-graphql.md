@@ -49,12 +49,12 @@ There's already [native client support][apollo-rsc].
 
 [apollo-rsc]: https://www.apollographql.com/docs/react/integrations/nextjs#react-server-components
 
-In all cases above, the data we provide may ultimately be displayed to end users.
-Therefore it needs to have the same business logic and auth checks applied as
-your existing external API - otherwise we risk leaking private information through
-the model and back out to the user. So from a safety perspective alone, it would
-be nice to directly reuse the external GraphQL API which already handles these
-concerns... on the server :)
+In all cases above, the data we provide may ultimately be displayed to end
+users. Therefore it needs to have the same business logic and auth checks
+applied as your existing external API - otherwise we risk leaking private
+information through the model and back out to the user. So from a safety
+perspective alone, it would be nice to directly reuse the external GraphQL API
+which already handles these concerns... on the server :)
 
 ## The case _against_ service-to-Service GraphQL
 
