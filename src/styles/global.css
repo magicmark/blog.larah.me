@@ -164,9 +164,11 @@ details {
 	padding: 0.75em 1em;
 	margin: 1em 0;
 }
-details[open] {
-	padding-bottom: 0.75em;
+
+details[open] > p:last-child {
+	margin-bottom:  0em;
 }
+
 details summary {
 	font-weight: 600;
 	cursor: pointer;

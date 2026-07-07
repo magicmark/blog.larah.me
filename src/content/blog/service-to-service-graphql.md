@@ -1,6 +1,6 @@
 ---
 title: "The Case for Service-to-Service GraphQL"
-pubDate: '2026-06-25T21:21:00.284Z'
+pubDate: '2026-07-07T21:21:00.284Z'
 description: |
   Using GraphQL for service-to-service communication is not necessarily an
   anti-pattern. In many cases, it's actually turns out to be a great choice!
@@ -302,19 +302,17 @@ the number of services, developers, API versions and client versions. GraphQL
 can serve all client types, and is uniquely positioned to serve both public and
 internal use cases particularly well.
 
-There is almost certainly a GraphQL client already available for your chosen
-language:
+GraphQL clients are widely already across many languages:
 
-<span class="highlight"><a href="https://graphql.org/community/tools-and-libraries/?tags=client">https://graphql.org/community/tools-and-libraries/?tags=client</a></span>
+👉 <span class="highlight"><a href="https://graphql.org/community/tools-and-libraries/?tags=client">https://graphql.org/community/tools-and-libraries/?tags=client</a></span>
 
-(If you don't find a suitable client, please comment on this post!)
+(If you don't find a suitable client for your language, please comment on this post!)
 
 Maintaining one thing is easier than maintaining multiple things. In short: 
 
 > Want to keep your backend DRY? Consolidate on a GraphQL API!
 
 ## Appendix
-
 
 <details>
 <summary>Should internal traffic go via the GraphQL Federation Router?</summary>
@@ -325,8 +323,6 @@ shared Router - that's fine too - and in which case, ignore this section.
 This post talks a lot about Federation, so it’s worth clarifying one related
 question: should internal service-to-service traffic also go through the Router?
 
-(At time of writing, vendor websites neither explicitly support or rule out
-internal services hitting the a Router.)
 
 My answer would be **yes** for the following reasons:
 
@@ -361,118 +357,77 @@ other solutions in this space which may also fit your use case.
 ### Cosmo Connect + Apollo Connectors
 
 The idea of "maintain a single API but expose it on multiple platforms" can also
-be achieved by making the GraphQL layer on top of endpoints.
+be achieved by layering GraphQL on top of endpoints -- but with codegen, rather
+than an old-timey manually created set of imperative mappings.
 
-**[Cosmo Router's support for gRPC
-Services](https://cosmo-docs.wundergraph.com/router/gRPC/grpc-services)** offers
-a very compelling alternative if you're already in the gRPC ecosystem and wish
-to only write and maintain gRPC endpoints. tl;dr you write `.graphql` schemas
-that codegen to `.proto` files; the Federation router knows how to translate the
-request and make native gRPC calls to your service.
+Cosmo Router supports calling [gRPC
+Services](https://cosmo-docs.wundergraph.com/router/gRPC/grpc-services), which
+offers a very compelling alternative if you're already in the gRPC ecosystem and
+allows you to get the best of both worlds (gRPC + GraphQL). You write `.graphql`
+schemas, which codegens into `.proto` files. The router translates inbound
+GraphQL requests into upstream native gRPC calls to your service.
 
 Similarly, [Apollo
 Connectors](https://www.apollographql.com/docs/graphos/connectors/requests)
-provide native support to the Apollo Gateway for calling HTTP Services by
+provides native support to the Apollo Gateway for calling HTTP Services by
 defining mappings via the `@connect` directive.
 
-And for at GraphQLConf 2025, LinkedIn demonstrated their custom `.proto` ->
-`.graphql` translation layer. In theory, this could be plugged into a
-supergraph.
+And at GraphQLConf 2025, [LinkedIn
+demonstrated](https://www.youtube.com/watch?v=Orgyp3xOqwY) their custom `.proto`
+-> `.graphql` translation layer (which in theory I assume could also be plugged
+into a supergraph).
 
-Although this isn't open sourced (as far as I can
-tell), it's another interesting "reverse" approach to the above, and could in
-theory be plugged into a router as a subgraph.
+I haven't personally used any of these offerings. But if you have the luxury of
+starting from scratch, these options  likely offer the least amount of total
+complexity.
 
-This is not a sponsored blog post; I haven't personally used any of these
-options. But 
+### Entity Frameworks'
 
-### Ent
+(a.k.a. "fancy ORMs")
 
-### Entity Frameworks
+[ent](https://entgo.io/) is an open source version of Meta's internal framework
+I'll mostly talk about ent; the open source version of ent
+</details>
 
-https://cosmo-docs.wundergraph.com/router/gRPC/grpc-services
+<details>
+<summary>JSON performance</summary>
 
-### Cap'n'web
+> _"JSON is too inefficient to use for service-to-service!"_
 
-https://github.com/cloudflare/capnweb
+If you're a hyperscale user (regularly transferring gigabytes of data or doing
+high frequency trading) then fair - and I don't think this post applies to you
+at all.
 
-There are some intriguing language or vendor specific options such as [GraphQL->gRPC][wundergraph],
-[gRPC->GraphQL][linkedin] and
+But if you're a "traditional" web application:
 
-[wundergraph]: https://cosmo-docs.wundergraph.com/router/gRPC/grpc-services
-[linkedin]: https://www.youtube.com/watch?v=Orgyp3xOqwY
+- inter-service payloads typically aren't (or shouldn't) be at the size where
+  the cost of JSON parsing or serialization is noticeable
+- compression works really well and is really fast
+- even if you apply the "ah but 300 bytes saved across hundreds of thousands of
+  QPS == $$$" logic, it still doesn't add up to very much
 
-These are however language or vendor specific. T
+I'm going to hand-wave this topic away for now since I plan on following up with 
+a blog post about this topic specifically. 
 
-## "JSON is too inefficient to use for service-to-service!"
+For more details though, I elaborated on this in [the
+talk](https://graphqlconf2026.sched.com/event/2IPbF/service-to-service-graphql-the-new-sweet-spot-mark-larah-yelp),
+and there's some numbers here provided by benjie:
+https://github.com/graphql/graphql-spec/issues/432
 
-JSON 
-Take a realistic payload -- a 20kb JSON list response. Apply zstd compression (which you should be using for any non-trivial payloads regardless of format):
+...oh and also [Argo](https://github.com/msolomon/argo) is an alternative binary
+protocol for GraphQL that is picking up steam -- [WhatsApp
+presented](https://graphqlconf2026.sched.com/event/2IPch/an-alternative-to-json-responses-argo-in-whatsapp-kevin-gorham-meta)
+about their usage of it.
+</details>
 
-- JSON + zstd: **2.8kb**
-- Protobuf + zstd: **2.5kb**
+<details>
+<summary>Acknowledgments</summary>
 
-The delta is about 300 bytes. On a 20kb payload. Over local networking (intra-AZ or intra-cluster), that difference is noise.
+Thanks to Benjie who reviewed my slides prior to GraphQLConf.
 
-"But parsing!" -- also largely noise in practice for the payload sizes we're talking about. If you're shuffling megabytes of binary data between services, yes, protobuf parsing will be meaningfully faster. For the typical business data payloads (sub-100kb) that most services deal with, the parsing overhead of JSON versus protobuf is not your bottleneck. Your database query, your network hop, your business logic computation -- those dominate.
-
-## Beyond JSON
-
-That said, JSON doesn't have to be the end of the story for GraphQL. The GraphQL spec has a section on JSON serialization, which implies other serializations are possible.
-
-Argo (github.com/msolomon/argo) is a binary format designed specifically for GraphQL responses. It takes advantage of the fact that both client and server know the schema and the query shape, so it can strip out redundant structural information.
-
-WunderGraph's Cosmo router already supports gRPC transport between services while still exposing GraphQL to clients -- giving you the GraphQL developer experience with binary transport under the hood.
-
-This space is early but active. The performance gap between GraphQL-over-JSON and gRPC-with-protobufs is already small for most use cases, and it's likely to shrink further.
-
-## When this does and doesn't apply
-
-I'm not arguing that every service should talk GraphQL. Here's the sweet spot:
-
-- You have multiple internal clients that need data (cron jobs, webhooks, agents, SDUI servers)
-- You have multiple external clients (web, mobile, third-party)
-- Internal networking stays local (at minimum intra-availability-zone)
-- You're already using or want to use GraphQL Federation
-- Your payloads are small to medium (under 100kb)
-- You're already using or want to use GraphQL for client-facing APIs
-
-If you don't tick most of those boxes, this probably isn't for you. If codegen from your data models plus minimal templating solves your problem, keep doing that. If thin resolvers on a solid business logic layer work and you're happy maintaining multiple API surfaces, that's fine too. If the extra milliseconds or bytes from JSON transport are genuinely your bottleneck (you're doing high-frequency trading, processing massive binary blobs, etc.), then GraphQL isn't the right tool for that specific communication path.
-
-But if you've already built a GraphQL API that handles auth, caching, and business logic -- using it for service-to-service communication isn't heresy. It's an excellent tradeoff that keeps your backend DRY and reduces the surface area you need to maintain.
-
-## Wrapping up
-
-Services-as-clients are no longer an edge case. LLM agents, server-driven UI, internal automation -- these are all services that need your business data with your business rules applied. GraphQL was designed for clients. Turns out, your backend services can be clients too.
-
-If you want to keep your backend DRY and you're already in the GraphQL world, consolidating on a single GraphQL API for both internal and external consumers is worth serious consideration. The performance objections don't hold up under scrutiny for most workloads, the maintenance savings are real, and the use cases driving this aren't going away.
-https://github.com/6over3/bebop
-
-
-To be clear: 
-been pretty clear: GraphQL is for clients,
-gRPC (or similar) is for services. Marc-Andre Giroux wrote about it back in 2020 on productionreadygraphql.com. The Principled GraphQL guidelines echoed the same idea. And the reasoning made sense -- gRPC gives you protobufs (smaller, faster to parse), Kubernetes has built-in support for gRPC load balancing, and the ergonomics of code-generated clients from .proto files are genuinely good.
-
-
-multi-seri
-But of course, we cannot  services don't exist in a vacuum and we s
-
-But And from a pure performance perspective
-
-or that GraphQL is "better" than gRPC or
-cap'n'proto or any other data transport protocol. On pure performance alone,
-these other technologies do win -- but unless you're truly a hyperscale user
-and transfering gigabytes of data between services in the critical path of a
-request, this is unlikely to be your performance or cost bottleneck.
-
-JSON parsing is fast!
-
-Developer experien
-
-
-is bad. From a pure performance and ergonomics standpoint, it's the more obvious
-choice for service-to-service communication. But "obvious" and "optimal for your
-situation" aren't always the same thing.
-
-
-
+Thanks to Marc-Andre for inspiring the original talk with:
+https://productionreadygraphql.com/blog/2020-05-14-sweetspot. I've referenced
+this blog post many times internally, and I still think it's relevant, even with
+this blog post. (The reframing being that services increasingly count as
+non-trivial "clients" now too)
+</details>

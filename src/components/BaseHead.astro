@@ -2,7 +2,7 @@
 import 'modern-normalize/modern-normalize.css';
 import '../styles/global.css';
 import type { ImageMetadata } from 'astro';
-import FallbackImage from '../assets/blog-placeholder-1.jpg';
+import FallbackImage from '../assets/default-share-card.png';
 import { SITE_TITLE } from '../consts';
 import { Font } from 'astro:assets';
 
@@ -48,3 +48,5 @@ const { title, description, image = FallbackImage } = Astro.props;
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image.src, Astro.url)} />
+
+<script data-goatcounter="https://mark-blog.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
