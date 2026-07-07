@@ -158,10 +158,10 @@ business logic layer. Per-API adaptor logic must be done per-API.
 Let's also zoom into the differences between the fields the external (GraphQL) and
 an internal (REST) service might return for the same domain object:
 
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+<div class="side-by-side">
 <div>
 
-<p style="margin-bottom: -0.5em;"><strong>External GraphQL API</strong></p>
+<p class="side-by-side-header"><strong>External GraphQL API</strong></p>
 
 ```graphql
 type Business {
@@ -174,7 +174,7 @@ type Business {
 </div>
 <div>
 
-<p style="margin-bottom: -0.5em;"><strong>Internal REST Service</strong></p>
+<p class="side-by-side-header"><strong>Internal REST Service</strong></p>
 
 ```python
 class BusinessResponse(pydantic.BaseModel):
@@ -195,8 +195,8 @@ takes into account the user's timezone).
 
 But did you also spot the difference in `phoneNumber`? Trick question! It looks
 the same, but could actually be a totally different value -- because for some
-businesses, we need to substitute a _[call reporting
-number](https://biz.yelp.com/support-center/Advertising_on_Yelp/Yelp_Ads/What-is-Call-Reporting/en-US)_
+businesses, we need to substitute a "[call reporting
+number](https://biz.yelp.com/support-center/Advertising_on_Yelp/Yelp_Ads/What-is-Call-Reporting/en-US)"
 instead when displaying to users via the external API. Values that look the same
 but are subtly different across different APIs becomes very confusing.
 
@@ -218,89 +218,144 @@ type Business {
 }
 ```
 
-Throw everything in GraphQL -- both the external and internal-only fields.
+Just throw everything in GraphQL -- both external and internal-only fields.
+There's no penalty for doing so:
 
-To be clear:
+- Private fields can be kept private via an executable `@internalOnly` directive.
+- Fields aren't fetched unless requested in a query, so there's no performance
+  concern for including them all in the schema.
 
-- Private fields are kept private via the `@internalOnly` directive.
-- Fields aren't executed unless requested in a query, so there's no performance
-  penalty for including them all in the schema.
-- Separation of concerns between private and external fields can be further
-  enforced using _Schema Contracts_ — a common vendor feature* to ship different
-  slices of the schema to different consumers. This could be applied here, to
-  omit private-only field visibility entirely from the external schema.
-  (<small>*[Apollo](https://www.apollographql.com/docs/graphos/platform/schema-management/delivery/contracts/overview), 
-  [WunderGraph](https://cosmo-docs.wundergraph.com/concepts/schema-contracts), 
-  [Hive](https://the-guild.dev/graphql/hive/docs/schema-registry/contracts)</small>)
-
-Better yet, instead of `@internalOnly`, use an [`@auth`
+Better yet, use an [`@auth`
 directive](https://graphql.org/learn/authorization/#using-type-system-directives)
-(or similar) to enforce granular RBAC or ABAC policies. (And better still,
-define and derive these policies from [higher up in the
-stack][auth-in-logic-layer]... which is the subject of different post 😅)
+(or similar) to enforce granular RBAC or ABAC policies rather than a simple
+"public" vs "private" split.
+
+(And better still, define and derive these policies from [higher up in the
+stack][auth-in-logic-layer], which is possibly the subject of different post 😅)
 
 [auth-in-logic-layer]: https://graphql.org/learn/authorization/#type-and-field-authorization
 
-### Should internal traffic go via the GraphQL Federation Router?
+### Internal-only types
+
+Some types will never be useful to be exposed via the external API. Services
+often need to expose some raw representation of data that must always be
+transformed into some other type before it's useful to any client.
+
+That's fine! For example, consider the following two GraphQL services:
+
+<div class="side-by-side">
+<div>
+<p class="side-by-side-header"><strong><code>products</code></strong></p>
+
+```graphql
+type Product {
+  name: String!
+  price: Float!
+}
+```
+</div>
+
+<div>
+<p class="side-by-side-header"><strong><code>offer_codes</code></strong></p>
+
+```graphql
+type Coupon @internalOnly {
+  code: String
+  percentage: Int
+}
+
+type User {
+  eligibleOffers: [Coupon] @internalOnly
+}
+```
+</div>  
+
+</div>
+
+The `Product.price` resolver needs to call the `offer_codes` service in order to
+apply a modifier to the price displayed to the user.
+
+This implies a GraphQL query executed from inside a GraphQL query.
+Weird, but fine. We're ok with REST-inside-GraphQL, why not
+GraphQL-inside-GraphQL! Ideally the services/schemas could be restructured to
+avoid extra roundtrips, but this isn't always possible, or worth the effort.
+
+**Prior art:**
+["re-entrancy"](https://viaduct.airbnb.tech/blog/2025/09/15/viaduct-five-years-on-modernizing-the-data-oriented-service-mesh
+) is a first class feature of Viadict, Airbnb's GraphQL monolith.
+
+Taking things a step further, you could also use "Schema Contracts", a common
+vendor feature to omit such internal-only types entirely from the external
+schema.
+(<small>[Apollo](https://www.apollographql.com/docs/graphos/platform/schema-management/delivery/contracts/overview),
+[WunderGraph](https://cosmo-docs.wundergraph.com/concepts/schema-contracts),
+[Hive](https://the-guild.dev/graphql/hive/docs/schema-registry/contracts)</small>)
+
+## Summary
+
+With the rise of more folks "vibecoding" and the demand for quicker product
+iteration in general, having a single, centralized, universally accessible
+source of your company data has never been more valuable.
+
+There is a cost to maintaining multiple APIs types which only increases with
+the number of services, developers, API versions and client versions. GraphQL
+can serve all client types, and is uniquely positioned to serve both public and
+internal use cases particularly well.
+
+There is almost certainly a GraphQL client already available for your chosen
+language:
+
+<span class="highlight"><a href="https://graphql.org/community/tools-and-libraries/?tags=client">https://graphql.org/community/tools-and-libraries/?tags=client</a></span>
+
+(If you don't find a suitable client, please comment on this post!)
+
+Maintaining one thing is easier than maintaining multiple things. In short: 
+
+> Want to keep your backend DRY? Consolidate on a GraphQL API!
+
+## Appendix
+
 
 <details>
+<summary>Should internal traffic go via the GraphQL Federation Router?</summary>
 
-_(You may instead have many individual GraphQL services not connected to any
-shared Router - that's fine too - and in which case, ignore this section!)_
+You may instead have many individual GraphQL services not connected to any
+shared Router - that's fine too - and in which case, ignore this section.
 
 This post talks a lot about Federation, so it’s worth clarifying one related
 question: should internal service-to-service traffic also go through the Router?
 
-In theory, probably **yes**...but perhaps only when it becomes worthwhile.
+(At time of writing, vendor websites neither explicitly support or rule out
+internal services hitting the a Router.)
 
-From a developer experience perspective, it would be more ideal than manually
-making `n` individual network requests to `n` services. The cost however, is
-added operational complexity: the touter becomes another single-point-of-failure
-for internal service traffic, and may need to be be deployed and advertised
-more locally to keep latency down.
-
-That said, I think it’s still probably a good idea to use the router internally
-for the following reasons:
+My answer would be **yes** for the following reasons:
 
 - It’s easier to normalize differences between external and internal traffic
   centrally at the Router, rather than pushing that logic into every subgraph's
   middleware or individual resolvers.
-- In cases where data is required from multiple services, callsites can write a
+- In cases where data comes from multiple services, callsites can write a
   single query against the supergraph -- instead of manually orchestrating
-  multiple service calls and reimplementing router logic.
+  multiple service calls (and reimplementing router logic!)
 - If internal-only types are never queried through the Router, they may be
   orphaned and left out of the supergraph schema, which increases the risk of
   globally duplicated types and composition failures down the line.
+- Easier to reuse and share tooling - e.g. breaking change detection based on
+  supergraph schema changes.
 
-- **Centralized normalization:** It’s easier to normalize differences between
-  external and internal traffic centrally at the Router, rather than pushing that
-  logic into every subgraph’s middleware or individual resolvers.
-- **Unified queries:** In cases where data is required from multiple services,
-  callsites can write a single query against the supergraph -- instead of
-  manually orchestrating multiple service calls and reimplementing router logic.
-- **Schema hygiene:** If internal-only types are never queried through the
-  Router, they may be orphaned and left out of the supergraph schema, which
-  increases the risk of globally duplicated types and composition failures down
-  the line.
+The tradeoff is added operational complexity: the router becomes another
+single-point-of-failure for internal service traffic, and may need to be be
+deployed and advertised more locally to keep latency down. 
 
+If it seems silly and wasteful to introduce yet another proxy service for
+service-to-service traffic (assuming you already have a service mesh) then you
+could in theory hit the resolvers directly - and as a stepping stone, or where 
+usage is very limited, this seems reasonable.
 </details>
 
-- **Centralized normalization:** It’s easier to normalize differences between
-  external and internal traffic centrally at the Router, rather than pushing that
-  logic into every subgraph’s middleware or individual resolvers.
-- **Unified queries:** In cases where data is required from multiple services,
-  callsites can write a single query against the supergraph -- instead of
-  manually orchestrating multiple service calls and reimplementing router logic.
-- **Schema hygiene:** If internal-only types are never queried through the
-  Router, they may be
-  orphaned and left out of the supergraph schema, which increases the risk of
-  globally duplicated types and composition failures down the line.
+<details>
+<summary>Honorable mentions</summary>
 
-Can easier leverage the existing schema breaking change detection features.
-
-## Honorable mentions
-
-I didn't have time to mention these in my talk, but I wanted to do mention some
+I didn't have time to mention these in my talk, but I wanted to mention some
 other solutions in this space which may also fit your use case.
 
 ### Cosmo Connect + Apollo Connectors
@@ -349,13 +404,9 @@ There are some intriguing language or vendor specific options such as [GraphQL->
 
 These are however language or vendor specific. T
 
+## "JSON is too inefficient to use for service-to-service!"
 
-## JSON is too inefficient!
-
-
-
-This is the objection I hear most. And five years ago it would have been harder to dismiss. But the numbers tell a different story today.
-
+JSON 
 Take a realistic payload -- a 20kb JSON list response. Apply zstd compression (which you should be using for any non-trivial payloads regardless of format):
 
 - JSON + zstd: **2.8kb**
