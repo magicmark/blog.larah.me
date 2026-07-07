@@ -382,21 +382,28 @@ complexity.
 
 ### Entity Frameworks + Fancy ORMs
 
-Internally, Meta uses "Ent Framework" ([source](https://www.youtube.com/watch?v=nKp_LUFk8EU))
-behind GraphQL. [ent](https://entgo.io/) is the open source recreation (I don't work at
-Meta, but this is my understanding).
+Internally, Meta uses "Ent Framework"
+([source](https://www.youtube.com/watch?v=nKp_LUFk8EU)) behind GraphQL.
+[ent](https://entgo.io/) is the open source recreation (I don't work at Meta,
+but this is my understanding).
 
 Some particularly compelling features that Ent offers:
 
-- **Built in auth policies** -- at the ORM layer, not defined per-API ([docs](https://entgo.io/docs/privacy))
-  - In addition, lower level row level security can and should also be applied - but this is
-    a seperate topic!
-- **Codegen** -- Ent can auto-generate equivalent GraphQL schemas and protobuf schemas + implementation
-- **Hooks and interceptors** -- Can embed business logic rules inside the ORM to share between APIs
+- **Built in auth policies** -- at the ORM layer, not defined per-API
+  ([docs](https://entgo.io/docs/privacy))
+  - In addition, where possible, in-built database mechanisms such as
+    PostgreSQL's Row Level Security can and should also be applied - but this is
+    a separate topic!
+- **Codegen** -- Ent can auto-generate equivalent GraphQL schemas and protobuf
+  schemas + implementation
+- **Hooks and interceptors** -- Can embed business logic rules inside the ORM to
+  share between APIs
 
-You do still have to manually implement the GraphQL resolvers, and some of the per-API differences above still apply.
+You do still have to manually implement the GraphQL resolvers, and some of the
+per-API differences above still apply.
 
-But if I were starting from scratch with a layered approach (in Go), Ent would be a top contender.
+But if I were starting from scratch with a layered approach (in Go), Ent would
+be a top contender.
 
 </details>
 
