@@ -156,7 +156,7 @@ This difference would be awkward to bake into the `lookup_business(...)`
 business logic layer. Per-API adaptor logic must be done per-API.
 
 Let's also zoom into the differences between the fields the external (GraphQL) and
-an internal (REST) service might return for the same domain object:
+an internal (REST) API might return for the same domain object:
 
 <div class="side-by-side">
 <div>
