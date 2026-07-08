@@ -66,16 +66,18 @@ assert real world behavior or output. This applies to:
   - CLI inputs and output
   - Files written to disk
   - (Stubbed out) network requests made
-  - For testing React UIs: using React Testing Library to “click on buttons” etc
+  - For testing React UIs: using [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) to “click on buttons” etc
 
 **Note**: I say "integration-style" because I don’t think you should need to
 spin up actual services with docker or set up sandboxes. Many libraries and
 services ultimately do simple i/o that can either be stubbed out in-process
-(e.g. network requests), or for testing filesystem operations, using temporary
-directories.
+(e.g. [network
+requests](https://blog.pecar.me/disable-network-requets-when-running-pytest/)),
+or for testing filesystem operations, [using temporary
+directories](https://docs.pytest.org/en/stable/how-to/tmp_path.html).
 
 Testing at the edges is great. The main selling point is usually that because
-test are less coupled to “helper functions”, they are less brittle and can don’t
-have to change if you’re restructuring or swapping out some internal logic.
+tests are less coupled to “helper functions”, they are less brittle and can
+don’t have to change when restructuring or swapping out internal logic.
 
 But another benefit is: **less test code overall** 🙂
