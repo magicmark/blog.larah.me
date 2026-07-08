@@ -157,6 +157,9 @@ hr {
 	h4 {
 		font-size: 1em;
 	}
+	pre {
+		font-size: 0.9em;
+	}
 	.heading-anchor {
 		display: none;
 	}
