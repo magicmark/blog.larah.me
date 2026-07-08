@@ -61,7 +61,7 @@ I’ll refer to a classic KCD blog post for guidance here:
 In short, tell your agent to read that post and “test at the edges” of the
 system. Avoid many granular unit tests and avoid mocking (where possible).
 
-As much as possible, write integration-style tests that send real inputs and
+Write integration-style tests that send real inputs and
 assert real world behavior or output. This applies to:
   - CLI inputs and output
   - Files written to disk
