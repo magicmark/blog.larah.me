@@ -126,6 +126,7 @@ pre {
 	border-radius: 8px;
 	overflow-x: auto;
 	max-width: 100%;
+	font-size: 0.95em;
 }
 pre > code {
 	all: unset;
@@ -213,16 +214,16 @@ details summary::-webkit-details-marker {
 }
 
 .side-by-side {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
+	display: flex;
 	gap: 1rem;
 }
 .side-by-side > * {
+	flex: 1 1 auto;
 	min-width: 0;
 }
 @media (max-width: 720px) {
 	.side-by-side {
-		grid-template-columns: 1fr;
+		flex-direction: column;
 	}
 }
 .side-by-side-header {
@@ -248,8 +249,3 @@ p:has(span.highlight) {
 .highlight a:hover {
 	background: rgba(var(--gray-light), 0.5);
 }
-
-/* 
- a:hover {
-	background: rgba(var(--gray-light), 0.5);
-} */
