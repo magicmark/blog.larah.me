@@ -116,6 +116,19 @@ img {
 	height: auto;
 	border-radius: 8px;
 }
+figure {
+	margin: 1.5em 0;
+	padding: 0;
+	text-align: center;
+}
+figure img {
+	display: inline-block;
+}
+figcaption {
+	font-size: 0.9em;
+	color: rgb(var(--gray));
+	font-style: italic;
+}
 code {
 	padding: 2px 5px;
 	background-color: rgb(var(--gray-light));
@@ -126,7 +139,7 @@ pre {
 	border-radius: 8px;
 	overflow-x: auto;
 	max-width: 100%;
-	font-size: 0.95em;
+	font-size: 0.85em;
 }
 pre > code {
 	all: unset;
