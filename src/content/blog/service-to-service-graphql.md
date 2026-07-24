@@ -6,7 +6,7 @@ description: |
   anti-pattern. In many cases, it's actually turns out to be a great choice!
 ---
 
-I gave a [talk at GraphQL Conf 2026][talk] about using GraphQL for
+I recently gave a [talk at GraphQL Conf 2026][talk] about using GraphQL for
 service-to-service communication. This post is a condensed written version of
 those thoughts.
 
@@ -62,7 +62,7 @@ If we're evaluating the "best" data transport protocol _purely_ for
 service-to-service use cases, binary protocols offer an excellent developer
 experience, and win on raw performance alone (e.g. [gRPC](https://grpc.io/),
 [cap'n'proto](https://capnproto.org/), [bebop](https://github.com/6over3/bebop)
-to name a few). More commonly used however, are old-fashioned REST endpoints
+to name a few). More commonly used however, are good old-fashioned REST endpoints
 (ideally typed with Swagger/OpenAPI or similar).
 
 A ["boring"][boring] stack would reasonably be:
